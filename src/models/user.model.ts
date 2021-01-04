@@ -24,12 +24,6 @@ export class User extends Document {
 
   @Prop({ nullable: true })
   biography: string
-  
-  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'User', default: [], autopopulate: true }])
-  followers: string[]
-
-  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'User', default: [], autopopulate: true }])
-  followings: string[]
 
   @Prop({ type: MongooseSchema.Types.Mixed, nullable: true, default: {} })
   social_networks: {

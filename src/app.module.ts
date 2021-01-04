@@ -6,9 +6,9 @@ import { ConfigurationModule } from './config/config.module';
 import { DatabaseModule } from './database/database.module';
 import { ControllersModule } from './controllers/controllers.module';
 import { DecoratorsModule } from './decorators/decorators.module';
-import { GuardsModule } from './guards/guards.module';
 import { ModelsModule } from './models/models.module';
 import { ServicesModule } from './services/services.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { ServicesModule } from './services/services.module';
     DatabaseModule, 
     CloudinaryModule, 
     DecoratorsModule, 
-    GuardsModule
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,13 +1,12 @@
 import { Length, IsEmail } from 'class-validator';
 
-export class UserInput {
+export interface CreateUserInput {
     readonly name: string
     readonly username: string
     readonly email: string
     readonly birthday: Date
     readonly biography: string
-    readonly followings: string[]
-    readonly followers: string[]
+    readonly password: string
     readonly social_networks: {
       facebook: string,
       instagram: string,
@@ -18,3 +17,16 @@ export class UserInput {
     readonly google_login: boolean
     readonly facebook_login: boolean
 }
+
+export interface SearchUserInput {
+    readonly skip: number
+    readonly limit: number
+    readonly name: string
+    readonly username: string
+    readonly email: string
+    readonly birthday_min: Date
+    readonly birthday_max: Date
+}
+
+export interface UpdateUserInput extends CreateUserInput {}
+export interface DeleteUserInput extends CreateUserInput {}
