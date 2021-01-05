@@ -11,5 +11,6 @@ export default () => ({
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
     SECRET_JWT: process.env.SECRET_JWT,
-    SECRET_SALT: process.env.SECRET_SALT
+    SECRET_SALT: process.env.SECRET_SALT,
+    UPLOAD: process.env.UPLOAD
 })

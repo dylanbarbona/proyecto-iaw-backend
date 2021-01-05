@@ -5,6 +5,7 @@ export interface CreateUserInput {
     readonly username: string
     readonly email: string
     readonly birthday: Date
+    readonly profile_photo: string
     readonly biography: string
     readonly password: string
     readonly social_networks: {

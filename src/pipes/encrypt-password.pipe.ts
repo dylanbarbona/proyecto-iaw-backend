@@ -1,8 +1,8 @@
+const bcrypt = require('bcrypt')
 import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
-import bcrypt from 'bcrypt'
 import { ConfigService } from '@nestjs/config';
-import { Config } from 'src/config/config.keys';
-
+import { Config } from '../config/config.keys';
+import { User } from '../models/user.model';
 
 @Injectable()
 export class EncryptPasswordPipe implements PipeTransform<any, any> {
@@ -15,5 +15,5 @@ export class EncryptPasswordPipe implements PipeTransform<any, any> {
             return { ...value, password: encryptedPassword }
         }
         return value
-    }    
+    }
 }

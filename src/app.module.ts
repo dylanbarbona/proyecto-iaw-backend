@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CloudinaryModule } from './database/cloudinary/cloudinary.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { ConfigurationModule } from './config/config.module';
 import { DatabaseModule } from './database/database.module';
 import { ControllersModule } from './controllers/controllers.module';

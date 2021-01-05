@@ -3,6 +3,7 @@ import { UserService } from '../services/user.service';
 import { CreateUserInput, SearchUserInput, UpdateUserInput } from 'src/inputs/user.input';
 import { UserDTO } from '../dto/user.dto';
 import { AuthService } from '../auth/auth.service';
+import { EncryptPasswordPipe } from '../pipes/encrypt-password.pipe';
 
 @Controller('auth')
 export class AuthController {
@@ -17,7 +18,7 @@ export class AuthController {
     }
 
     @Post('register')
-    async register(@Body() input: CreateUserInput): Promise<{ token: string }> {
+    async register(@Body(EncryptPasswordPipe) input: CreateUserInput): Promise<{ token: string }> {
         let user = await this.userService.create(input)
         return await this.authService.login(user)
     }
