@@ -1,4 +1,5 @@
-import { Controller, Post, Get, Put, Delete, Param, Body, Query, Req, Res, Request, Response, HttpCode, HttpStatus, UseGuards, UseInterceptors, UploadedFile, UsePipes, HttpException } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Param, Body, Query, Req, Res, HttpCode, HttpStatus, UseGuards, UseInterceptors, UploadedFile, UsePipes, HttpException } from '@nestjs/common';
+import { Response, Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express'
 import { JwtAuthGuard } from '../auth/jwt.guard';
@@ -17,33 +18,33 @@ export class UserController {
         private readonly cloudinaryService: CloudinaryService){ }
 
     @Post()
-    async findAll(@Body() search: SearchUserInput): Promise<UserDTO[]> {
-        return await this.userService.getAll(search)
+    async findAll(@Body() search: SearchUserInput, @Res() res: Response){
+        res.status(HttpStatus.OK).json(await this.userService.getAll(search))
     }
     
     @Get(':id')
-    async findOne(@Param('id') id: string): Promise<UserDTO> {
-        return await this.userService.getById(id)
+    async findOne(@Param('id') id: string, @Res() res: Response){
+        res.status(HttpStatus.OK).json(await this.userService.getById(id))
     }
 
     @Put()
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(FileInterceptor("file", { dest: "./uploads" }))
-    async update(@Req() req, @Body(EncryptPasswordPipe) input: UpdateUserInput, @UploadedFile() file): Promise<UserDTO> {
+    async update(@Body(EncryptPasswordPipe) input: UpdateUserInput, @UploadedFile() file, @Req() req, @Res() res: Response){
         const { profile_photo } = await this.submitProfilePhoto(file)
-        return await this.userService.update(req.user.user._id, { ...input, profile_photo})
+        res.status(HttpStatus.OK).json(await this.userService.update(req.user.user._id, { ...input, profile_photo}))
     }
 
     @Delete()
     @UseGuards(JwtAuthGuard)
-    async remove(@Req() req): Promise<UserDTO> {
-        return await this.userService.delete(req.user.user._id)
+    async remove(@Req() req, @Res() res: Response){
+        res.status(HttpStatus.OK).json(await this.userService.delete(req.user.user._id))
     }
 
     @Get()
     @UseGuards(JwtAuthGuard)
-    async whoAmI(@Req() req){
-        return req.user
+    async whoAmI(@Req() req, @Res() res: Response){
+        res.status(HttpStatus.OK).json(req.user.user)
     }
 
     private async submitProfilePhoto(file: File): Promise<{ profile_photo: string }>{
