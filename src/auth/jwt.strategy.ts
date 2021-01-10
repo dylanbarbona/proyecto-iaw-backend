@@ -6,11 +6,10 @@ import { Injectable } from '@nestjs/common';
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor() {
         super({
-            //jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             jwtFromRequest: (req) => {
                 let token = null;
                 if (req && req.cookies)
-                    token = req.cookies['bearer_token'];
+                    token = req.cookies['access_token'];
                 return token
             },
             signOptions: { expiresIn: '3600s' },

@@ -36,7 +36,7 @@ export class CloudinaryService {
 
     async submitFile(file: any): Promise<CloudinaryFile>{
         let cloudinary_file = await this.cloudinary.uploader.upload(file.path, { resource_type: this.getFileFormat(file.mimetype) }) as CloudinaryFile
-        await fs.unlink(file.path)
+        fs.unlinkSync(file.path)
         return cloudinary_file
     }
 

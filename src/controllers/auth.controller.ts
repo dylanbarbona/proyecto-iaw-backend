@@ -21,12 +21,12 @@ export class AuthController {
         @Res({ passthrough: true }) res: Response) {
             try {
                 const user = await this.authService.validateUser(input.username, input.password)
-                const token = await this.authService.login(user['_doc'])
+                const { token } = await this.authService.login(user['_doc'])
                 res.cookie('access_token', token, { httpOnly: true })
                     .status(HttpStatus.CREATED)
-                    .json(token)
+                    .json({ ok: true })
             }catch(error) {
-                res.status(HttpStatus.UNAUTHORIZED).json(error)
+                res.status(HttpStatus.UNAUTHORIZED).json({ ok: false })
             }
     }
 
@@ -37,12 +37,13 @@ export class AuthController {
         @Res({ passthrough: true }) res: Response){
             try {
                 const user = await this.userService.create(input)
-                const token = await this.authService.login(user['_doc'])
+                user.password = ':)'
+                const { token } = await this.authService.login(user['_doc'])
                 res.cookie('access_token', token, { httpOnly: true })
                     .status(HttpStatus.CREATED)
-                    .json(token)
+                    .json({ ok: true })
             }catch(error) {
-                res.status(HttpStatus.PRECONDITION_FAILED).json(error).send()
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ ok: false })
             }
     }
 
@@ -53,5 +54,6 @@ export class AuthController {
         @Res({ passthrough: true }) res: Response){
             res.clearCookie('access_token')
                 .status(HttpStatus.OK)
+                .json({ ok: true })
     }
 }

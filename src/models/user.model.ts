@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 
 
-@Schema()
+@Schema({ versionKey: false })
 export class User extends Document {
   @Prop({ nullable: false, unique: true })
   username: string
@@ -13,13 +13,13 @@ export class User extends Document {
   @Prop({ nullable: false, unique: true })
   email: string
   
-  @Prop({ nullable: false })
+  @Prop({ nullable: false, select: false })
   password: string
   
   @Prop({ type: Date, nullable: true })
   birthday: Date
 
-  @Prop({ nullable: true })
+  @Prop({ nullable: true, default: "NO_PHOTO" })
   profile_photo: string
 
   @Prop({ nullable: true })

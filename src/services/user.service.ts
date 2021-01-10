@@ -22,7 +22,7 @@ export class UserService {
     }
 
     async getByUsername(username: string): Promise<User>{
-        return await this.userModel.findOne({ username })
+        return await this.userModel.findOne({ username }).select('password')
     }
 
     async create(input: CreateUserInput): Promise<User>{

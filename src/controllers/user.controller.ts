@@ -32,26 +32,25 @@ export class UserController {
     @UseInterceptors(FileInterceptor("file", { dest: "./uploads" }))
     async update(@Body(EncryptPasswordPipe) input: UpdateUserInput, @UploadedFile() file, @Req() req, @Res() res: Response){
         const { profile_photo } = await this.submitProfilePhoto(file)
-        res.status(HttpStatus.OK).json(await this.userService.update(req.user.user._id, { ...input, profile_photo}))
+        res.status(HttpStatus.OK).json(await this.userService.update(req.user._id, { ...input, profile_photo}))
     }
 
     @Delete()
     @UseGuards(JwtAuthGuard)
     async remove(@Req() req, @Res() res: Response){
-        res.status(HttpStatus.OK).json(await this.userService.delete(req.user.user._id))
+        res.status(HttpStatus.OK).json(await this.userService.delete(req.user._id))
     }
 
     @Get()
     @UseGuards(JwtAuthGuard)
     async whoAmI(@Req() req, @Res() res: Response){
-        res.status(HttpStatus.OK).json(req.user.user)
+        res.status(HttpStatus.OK).json(req.user)
     }
 
     private async submitProfilePhoto(file: File): Promise<{ profile_photo: string }>{
-        if(file != null){
-            let cloudFile = await this.cloudinaryService.submitFile(file)
-            return { profile_photo: cloudFile.secure_url }
-        }
-        return { profile_photo: 'NO_PHOTO' }
+        if(!file)
+            return { profile_photo: 'NO_PHOTO' }
+        let cloudFile = await this.cloudinaryService.submitFile(file)
+        return { profile_photo: cloudFile.secure_url }
     }
 }
