@@ -8,13 +8,13 @@ import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 
 import { UserController } from './user.controller';
 import { AuthController } from './auth.controller';
-import { PostController } from './post.controller';
 import { CategoryController } from './category.controller';
 import { CollectionController } from './collection.controller';
-import { CommentController } from './comment.controller';
-import { FollowController } from './follow.controller';
-import { LikeController } from './like.controller';
+import { PostController } from './post.controller';
 import { NotificationController } from './notification.controller';
+import { LikeController } from './like.controller';
+import { FollowController } from './follow.controller';
+import { CommentController } from './comment.controller';
 
 @Module({
     imports: [ 
@@ -26,13 +26,13 @@ import { NotificationController } from './notification.controller';
     controllers: [
         AuthController,
         UserController,
-        PostController,
         CategoryController,
         CollectionController,
-        CommentController,
-        FollowController,
+        PostController,
+        NotificationController,
         LikeController,
-        NotificationController
+        FollowController,
+        CommentController
     ]
 })
 export class ControllersModule {}

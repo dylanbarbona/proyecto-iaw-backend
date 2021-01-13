@@ -16,11 +16,11 @@ export class AuthController {
 
     @Post('login')
     async login(
-        @Body() input: { username: string, password: string }, 
+        @Body() input: { username: string, email: string, password: string }, 
         @Req() req: Request, 
         @Res({ passthrough: true }) res: Response) {
             try {
-                const user = await this.authService.validateUser(input.username, input.password)
+                const user = await this.authService.validateUser(input.username, input.email, input.password)
                 const { token } = await this.authService.login(user['_doc'])
                 res.cookie('access_token', token, { httpOnly: true })
                     .status(HttpStatus.CREATED)
@@ -37,7 +37,6 @@ export class AuthController {
         @Res({ passthrough: true }) res: Response){
             try {
                 const user = await this.userService.create(input)
-                user.password = ':)'
                 const { token } = await this.authService.login(user['_doc'])
                 res.cookie('access_token', token, { httpOnly: true })
                     .status(HttpStatus.CREATED)
@@ -52,8 +51,6 @@ export class AuthController {
     async logout(
         @Req() req: Request, 
         @Res({ passthrough: true }) res: Response){
-            res.clearCookie('access_token')
-                .status(HttpStatus.OK)
-                .json({ ok: true })
+            res.clearCookie('access_token').status(HttpStatus.OK).json({ ok: true })
     }
 }

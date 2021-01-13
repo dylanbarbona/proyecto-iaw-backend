@@ -1,8 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 
+export enum Role {
+    ADMIN_ROLE = "ADMIN",
+    USER_ROLE = "USER"
+}
 
-@Schema({ versionKey: false })
+@Schema()
 export class User extends Document {
   @Prop({ nullable: false, unique: true })
   username: string
@@ -19,7 +23,7 @@ export class User extends Document {
   @Prop({ type: Date, nullable: true })
   birthday: Date
 
-  @Prop({ nullable: true, default: "NO_PHOTO" })
+  @Prop({ nullable: true })
   profile_photo: string
 
   @Prop({ nullable: true })
@@ -39,6 +43,9 @@ export class User extends Document {
 
   @Prop({ nullable: true, default: false })
   facebook_login: boolean
+
+  @Prop({ nullable: false, type: MongooseSchema.Types.Array, default: [Role.USER_ROLE] })
+  roles: Role[]
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -1,4 +1,5 @@
 import { Length, IsEmail } from 'class-validator';
+import { Role } from '../models/user.model';
 
 export interface CreateUserInput {
     readonly name: string
@@ -17,16 +18,18 @@ export interface CreateUserInput {
     }
     readonly google_login: boolean
     readonly facebook_login: boolean
+    readonly roles: Role[]
 }
 
 export interface SearchUserInput {
-    readonly skip: number
-    readonly limit: number
-    readonly name: string
-    readonly username: string
-    readonly email: string
-    readonly birthday_min: Date
-    readonly birthday_max: Date
+    readonly _id?: string
+    readonly skip?: number
+    readonly limit?: number
+    readonly name?: string
+    readonly username?: string
+    readonly email?: string
+    readonly birthday_min?: Date
+    readonly birthday_max?: Date
 }
 
 export interface UpdateUserInput extends CreateUserInput {}

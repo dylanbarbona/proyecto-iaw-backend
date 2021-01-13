@@ -2,7 +2,7 @@ import { Controller, Post, Get, Put, Delete, Param, Body, Query, Req, Res, HttpC
 import { Response, Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express'
-import { JwtAuthGuard } from '../auth/jwt.guard';
+import { JwtAuthGuard, Roles } from '../auth/jwt.guard';
 import { UserService } from '../services/user.service';
 import { CreateUserInput, SearchUserInput, UpdateUserInput } from '../inputs/user.input';
 import { UserDTO } from '../dto/user.dto';
@@ -10,6 +10,8 @@ import { EncryptPasswordPipe } from 'src/pipes/encrypt-password.pipe';
 
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { CloudinaryFile } from '../cloudinary/cloudinary.interface';
+import { Role } from 'src/models/user.model';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 @Controller('user')
 export class UserController {
@@ -23,8 +25,8 @@ export class UserController {
     }
     
     @Get(':id')
-    async findOne(@Param('id') id: string, @Res() res: Response){
-        res.status(HttpStatus.OK).json(await this.userService.getById(id))
+    async findOne(@Param('id') _id: string, @Res() res: Response){
+        res.status(HttpStatus.OK).json(await this.userService.get({ _id }))
     }
 
     @Put()
@@ -32,13 +34,14 @@ export class UserController {
     @UseInterceptors(FileInterceptor("file", { dest: "./uploads" }))
     async update(@Body(EncryptPasswordPipe) input: UpdateUserInput, @UploadedFile() file, @Req() req, @Res() res: Response){
         const { profile_photo } = await this.submitProfilePhoto(file)
-        res.status(HttpStatus.OK).json(await this.userService.update(req.user._id, { ...input, profile_photo}))
+        res.status(HttpStatus.OK).json(await this.userService.update({ _id: req.user._id }, { ...input, profile_photo}))
     }
 
     @Delete()
-    @UseGuards(JwtAuthGuard)
+    //@Roles(Role.ADMIN_ROLE)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     async remove(@Req() req, @Res() res: Response){
-        res.status(HttpStatus.OK).json(await this.userService.delete(req.user._id))
+        res.status(HttpStatus.OK).json(await this.userService.delete({ _id: req.user._id }))
     }
 
     @Get()
