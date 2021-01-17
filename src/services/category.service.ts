@@ -3,30 +3,34 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from '../models/category.model';
 import { SearchCategoryInput, CreateCategoryInput, UpdateCategoryInput } from '../inputs/category.input';
-import { CategoryDTO } from '../dto/category.dto';
 
 @Injectable()
 export class CategoryService {
+    private readonly EMPTY_STRING = ''
+    private readonly LIMIT = 10
+    private readonly SKIP = 0
 
     constructor(@InjectModel('Category') private readonly categoryModel: Model<Category>){ }
 
-    async getAll(input: SearchCategoryInput): Promise<CategoryDTO[]> {
-        return await this.categoryModel.find(input)
+    async getAll(search: SearchCategoryInput): Promise<Category[]> {
+        return await this.categoryModel.find({
+            name: { $regex:  `${search.name || this.EMPTY_STRING}` }
+        }).limit(Number(search.limit) || this.LIMIT).skip(Number(search.skip) || this.SKIP)
     }
 
-    async get(input: SearchCategoryInput): Promise<CategoryDTO> {
+    async get(input: SearchCategoryInput): Promise<Category> {
         return await this.categoryModel.findOne(input)
     }
 
-    async create(input: CreateCategoryInput): Promise<CategoryDTO> {
+    async create(input: CreateCategoryInput): Promise<Category> {
         return await new this.categoryModel(input).save()
     }
 
-    async update(search: SearchCategoryInput, input: UpdateCategoryInput): Promise<CategoryDTO> {
+    async update(search: SearchCategoryInput, input: UpdateCategoryInput): Promise<Category> {
         return await this.categoryModel.findOneAndUpdate(search, input)
     }
 
-    async delete(input: SearchCategoryInput): Promise<CategoryDTO> {
+    async delete(input: SearchCategoryInput): Promise<Category> {
         return await this.categoryModel.findOneAndDelete(input)
     }
 }

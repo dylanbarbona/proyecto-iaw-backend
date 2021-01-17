@@ -19,15 +19,9 @@ export class AuthController {
         @Body() input: { username: string, email: string, password: string }, 
         @Req() req: Request, 
         @Res({ passthrough: true }) res: Response) {
-            try {
-                const user = await this.authService.validateUser(input.username, input.email, input.password)
-                const { token } = await this.authService.login(user['_doc'])
-                res.cookie('access_token', token, { httpOnly: true })
-                    .status(HttpStatus.CREATED)
-                    .json({ ok: true })
-            }catch(error) {
-                res.status(HttpStatus.UNAUTHORIZED).json({ ok: false })
-            }
+            const user = await this.authService.validateUser(input.username, input.email, input.password)
+            const { token } = await this.authService.login(user['_doc'])
+            res.cookie('access_token', token, { httpOnly: true }).status(HttpStatus.CREATED).json({ ok: true })
     }
 
     @Post('register')
@@ -35,15 +29,9 @@ export class AuthController {
         @Body(EncryptPasswordPipe) input: CreateUserInput, 
         @Req() req: Request, 
         @Res({ passthrough: true }) res: Response){
-            try {
-                const user = await this.userService.create(input)
-                const { token } = await this.authService.login(user['_doc'])
-                res.cookie('access_token', token, { httpOnly: true })
-                    .status(HttpStatus.CREATED)
-                    .json({ ok: true })
-            }catch(error) {
-                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ ok: false })
-            }
+            const user = await this.userService.create(input)
+            const { token } = await this.authService.login(user['_doc'])
+            res.cookie('access_token', token, { httpOnly: true }).status(HttpStatus.CREATED).json({ ok: true })
     }
 
     @Get('logout')
@@ -52,5 +40,11 @@ export class AuthController {
         @Req() req: Request, 
         @Res({ passthrough: true }) res: Response){
             res.clearCookie('access_token').status(HttpStatus.OK).json({ ok: true })
+    }
+
+    @Get('profile')
+    @UseGuards(JwtAuthGuard)
+    async whoAmI(@Req() req: Request, @Res() res: Response){
+        res.status(HttpStatus.OK).json(req.user)
     }
 }

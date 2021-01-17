@@ -19,41 +19,42 @@ export class UserController {
         private readonly userService: UserService,
         private readonly cloudinaryService: CloudinaryService){ }
 
-    @Post()
-    async findAll(@Body() search: SearchUserInput, @Res() res: Response){
-        res.status(HttpStatus.OK).json(await this.userService.getAll(search))
+    @Get()
+    async findAll(@Query() search: SearchUserInput){
+        return await this.userService.getAll(search)
     }
-    
-    @Get(':id')
-    async findOne(@Param('id') _id: string, @Res() res: Response){
-        res.status(HttpStatus.OK).json(await this.userService.get({ _id }))
+
+    @Get(':username')
+    async findOne(@Param('username') username: string){
+        return await this.userService.get({ username })
+    }
+
+    @Post()
+    @Roles(Role.ADMIN_ROLE)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    async create(@Body() input: CreateUserInput){
+        return await this.userService.create(input)
     }
 
     @Put()
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(FileInterceptor("file", { dest: "./uploads" }))
-    async update(@Body(EncryptPasswordPipe) input: UpdateUserInput, @UploadedFile() file, @Req() req, @Res() res: Response){
-        const { profile_photo } = await this.submitProfilePhoto(file)
-        res.status(HttpStatus.OK).json(await this.userService.update({ _id: req.user._id }, { ...input, profile_photo}))
+    async update(@Body(EncryptPasswordPipe) input: UpdateUserInput, @UploadedFile() file, @Req() req: Request){
+        const profile_photo = await this.submitProfilePhoto(file)
+        return await this.userService.update({ _id: req.user['_id'] }, { ...input, profile_photo})
     }
 
     @Delete()
-    //@Roles(Role.ADMIN_ROLE)
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    async remove(@Req() req, @Res() res: Response){
-        res.status(HttpStatus.OK).json(await this.userService.delete({ _id: req.user._id }))
-    }
-
-    @Get()
     @UseGuards(JwtAuthGuard)
-    async whoAmI(@Req() req, @Res() res: Response){
-        res.status(HttpStatus.OK).json(req.user)
+    async delete(@Req() req: Request, @Res() res: Response){
+        await this.userService.delete({ _id: req.user['_id'] })
+        res.redirect('/auth/logout')
     }
 
-    private async submitProfilePhoto(file: File): Promise<{ profile_photo: string }>{
+    private async submitProfilePhoto(file: File): Promise<string>{
         if(!file)
-            return { profile_photo: 'NO_PHOTO' }
+            return 'NO_PHOTO'
         let cloudFile = await this.cloudinaryService.submitFile(file)
-        return { profile_photo: cloudFile.secure_url }
+        return cloudFile.secure_url
     }
 }

@@ -32,5 +32,20 @@ export interface SearchUserInput {
     readonly birthday_max?: Date
 }
 
-export interface UpdateUserInput extends CreateUserInput {}
-export interface DeleteUserInput extends CreateUserInput {}
+export interface UpdateUserInput {
+    readonly name?: string
+    readonly username?: string
+    readonly email?: string
+    readonly birthday?: Date
+    readonly profile_photo?: string
+    readonly biography?: string
+    readonly password?: string
+    readonly social_networks?: {
+      facebook?: string,
+      instagram?: string,
+      twitter?: string,
+      youtube?: string,
+      linkedin?: string
+    }
+    readonly roles?: Role[]
+}

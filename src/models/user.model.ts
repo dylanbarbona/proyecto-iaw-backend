@@ -6,7 +6,7 @@ export enum Role {
     USER_ROLE = "USER"
 }
 
-@Schema()
+@Schema({ timestamps: true, versionKey: false })
 export class User extends Document {
   @Prop({ nullable: false, unique: true })
   username: string
@@ -31,11 +31,11 @@ export class User extends Document {
 
   @Prop({ type: MongooseSchema.Types.Mixed, nullable: true, default: {} })
   social_networks: {
-      facebook: string,
-      instagram: string,
-      twitter: string,
-      youtube: string,
-      linkedin: string
+      facebook?: string,
+      instagram?: string,
+      twitter?: string,
+      youtube?: string,
+      linkedin?: string
   }
 
   @Prop({ nullable: true, default: false })
