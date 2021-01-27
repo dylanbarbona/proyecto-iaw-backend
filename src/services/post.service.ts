@@ -1,6 +1,6 @@
 import { Injectable, UseInterceptors, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Mongoose, mongo } from 'mongoose';
 import { SearchPostInput, CreatePostInput, UpdatePostInput } from '../inputs/post.input';
 import { Post } from '../models/post.model';
 
@@ -14,20 +14,64 @@ export class PostService {
 
     constructor(@InjectModel('Post') readonly PostModel: Model<Post>){ }
 
-    async getAll(search: SearchPostInput): Promise<Post[]>{
-        return await this.PostModel.find({
-            user: search.user || this.EMPTY_STRING,
-            categories: { $in: search.categories },
-            $text: { $search:  search.description || this.EMPTY_STRING },
-            createdAt: { 
-                $gte: search.createdAt_min || this.MIN_DATE, 
-                $lt: search.createdAt_max || this.MAX_DATE 
-            },
-            updateddAt: { 
-                $gte: search.updatedAt_min || this.MIN_DATE, 
-                $lt: search.updatedAt_max || this.MAX_DATE 
-            }
-        }).limit(search.limit || this.LIMIT).skip(search.skip || this.SKIP)
+    async getFollowingPosts(followings: string[], search: SearchPostInput): Promise<Post[]>{
+        return await this.PostModel.find(
+            { 
+                user: { $in: followings }, 
+                createdAt: { 
+                    $gte: search.createdAt_min || this.MIN_DATE, 
+                    $lt: search.createdAt_max || this.MAX_DATE 
+                },
+                updatedAt: { 
+                    $gte: search.updatedAt_min || this.MIN_DATE, 
+                    $lt: search.updatedAt_max || this.MAX_DATE 
+                }
+            })
+            .limit(Number(search.limit) || this.LIMIT )    
+            .skip(Number(search.skip) || this.SKIP)
+    }
+
+    async getPostByCategory(search: SearchPostInput): Promise<Post[]>{
+        return await this.PostModel.find()
+            .where("categories").in(search.categories)
+            .limit(Number(search.limit) || this.LIMIT )    
+            .skip(Number(search.skip) || this.SKIP)
+    }
+
+    /*
+    async getPostByDescription(search: SearchPostInput): Promise<Post[]>{
+        return await this.PostModel.find(
+            { 
+                $text: { $search: search.description },
+                createdAt: { 
+                    $gte: search.createdAt_min || this.MIN_DATE, 
+                    $lt: search.createdAt_max || this.MAX_DATE 
+                },
+                updatedAt: { 
+                    $gte: search.updatedAt_min || this.MIN_DATE, 
+                    $lt: search.updatedAt_max || this.MAX_DATE 
+                }
+            })
+            .limit(Number(search.limit) || this.LIMIT )    
+            .skip(Number(search.skip) || this.SKIP)
+    }
+    */
+
+    async getPostByUser(search: SearchPostInput): Promise<Post[]>{
+        return await this.PostModel.find(
+            { 
+                user: search.user, 
+                createdAt: { 
+                    $gte: search.createdAt_min || this.MIN_DATE, 
+                    $lt: search.createdAt_max || this.MAX_DATE 
+                },
+                updatedAt: { 
+                    $gte: search.updatedAt_min || this.MIN_DATE, 
+                    $lt: search.updatedAt_max || this.MAX_DATE 
+                }
+            })
+            .limit(Number(search.limit) || this.LIMIT )    
+            .skip(Number(search.skip) || this.SKIP)
     }
 
     async get(search: SearchPostInput): Promise<Post>{

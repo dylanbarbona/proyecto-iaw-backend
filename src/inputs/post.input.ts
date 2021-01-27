@@ -1,28 +1,30 @@
+import { CreateCommentInput, UpdateCommentInput } from "./comment.input";
+
 export interface CreatePostInput {
-    _id?: string
-    user: string
-    categories: string[]
-    description: string
-    urls: string[]
+    _id?: String
+    user: String
+    categories: String[]
+    description: String
+    urls: String[]
 }
 
 export interface SearchPostInput {
-    _id?: string
-    user?: string
-    categories?: string[]
-    description?: string
+    _id?: String
+    user?: String
+    categories?: String[]
+    description?: String
     createdAt_max?: Date
     createdAt_min?: Date
     updatedAt_max?: Date
     updatedAt_min?: Date
-    limit?: number
-    skip?: number
+    limit?: Number
+    skip?: Number
 }
 
 export interface UpdatePostInput {
-    _id?: string
-    user?: string
-    categories?: string[]
-    description?: string
-    urls?: string[]
+    _id?: String
+    user?: String
+    categories?: String[]
+    description?: String
+    urls?: String[]
 }

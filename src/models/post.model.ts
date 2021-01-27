@@ -1,20 +1,24 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Comment, Comments } from './comment.model';
 
 @Schema({ timestamps: true, versionKey: false })
 export class Post extends Document {
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', autopopulate: true })
-  user: string
+    @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true, autopopulate: true })
+    user: String
   
-  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Category', autopopulate: true }])
-  categories: string[]
+    @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Category', required: true, autopopulate: true }])
+    categories: String[]
 
-  @Prop()
-  description: string
+    @Prop({ default: "" })
+    description: String
 
-  @Prop([{ type: MongooseSchema.Types.Array }])
-  urls: string[]
+    @Prop({ type: MongooseSchema.Types.Array })
+    urls: String[]
+
+    @Prop({ type: [Comments], autopopulate: true })
+    comments: Comment[]
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);
-PostSchema.index({ name: "description", "description": 'text' })
+PostSchema.index({ description: 'text' }, { weights: { description: 1 } });

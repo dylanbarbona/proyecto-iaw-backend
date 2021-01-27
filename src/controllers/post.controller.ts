@@ -17,9 +17,30 @@ export class PostController {
         private readonly postService: PostService,
         private readonly cloudinaryService: CloudinaryService){}
 
-    @Get()
-    async findAll(@Query() search: SearchPostInput){ 
-        return await this.postService.getAll(search)
+    @Get('search/categories')
+    async findByCategory(@Query() search: SearchPostInput){ 
+        return await this.postService.getPostByCategory(search)
+    }
+
+    @Get('search/user')
+    async findByUser(@Query() search: SearchPostInput){ 
+        return await this.postService.getPostByUser(search)
+    }
+
+    /*
+    @Get('search/description')
+    async findByDescription(@Query() search: SearchPostInput){ 
+        return await this.postService.getPostByDescription(search)
+    }
+    */
+
+    @Get('search/followings')
+    @Roles(Role.USER_ROLE)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    async getFollowingPosts(@Query() search: SearchPostInput, @Req() req: Request){ 
+        const user = req.user['_id']
+        //Buscar usuarios que sigue este usuario después de implementar esa funcion
+        return await this.postService.getFollowingPosts(user, search)
     }
 
     @Get(':id')
@@ -32,7 +53,7 @@ export class PostController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @UseInterceptors(FilesInterceptor("files", Number.MAX_VALUE, { dest: "./uploads" }))
     async create(@Body() input: CreatePostInput, @UploadedFiles() files, @Req() req: Request){
-        const { urls } = await this.submitFiles(files)
+        const urls = await this.submitFiles(files)
         input.user = req.user['_id']
         input.urls = urls
         return await this.postService.create(input)
@@ -43,7 +64,7 @@ export class PostController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @UseInterceptors(FilesInterceptor("files", Number.MAX_VALUE, { dest: "./uploads" }))
     async update(@Param('id') _id: string, @Body() input: UpdatePostInput, @UploadedFiles() files: File[], @Req() req: Request){
-        const { urls } = await this.submitFiles(files)
+        const urls = await this.submitFiles(files)
         input.urls = urls
         input.user = req.user['_id']
         return await this.postService.update({ _id, user: req.user['_id'] }, input)
@@ -56,12 +77,12 @@ export class PostController {
         return await this.postService.delete({ _id, user: req.user['_id'] })
     }
 
-    private async submitFiles(files: File[]): Promise<{ urls: string[] }>{
+    private async submitFiles(files: File[]): Promise<string[]>{
         let cloudinaryUrls: string[] = []
-        for(const file in files){
+        for(const file of files){
             const cloudFile = await this.cloudinaryService.submitFile(file)
             cloudinaryUrls.push(cloudFile.secure_url)
         }
-        return { urls: cloudinaryUrls }
+        return cloudinaryUrls
     }
 }
