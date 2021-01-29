@@ -1,32 +1,30 @@
-/*
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Like } from '../models/like.model';
+import { Order } from '../utils/order';
+import { Post } from '../models/post.model';
+import { LikeInput } from '../inputs/like.input';
 
 @Injectable()
 export class LikeService {
-    constructor(@InjectModel('Like') private readonly likeModel: Model<Like>){ }
+
+    async get(post: Post, order: Order = Order.DESC){
+        return this.sortByDate(post.likes, order)
+    }
+
+    async like(post: Post, input: LikeInput){
+        const index = post.likes.findIndex(like => like.user['_id'] == input.user)
+        index >= 0 ? post.likes = post.likes.splice(index, 0) : post.likes.push(input)
+        post = await post.save()
+        return post.likes
+    }
     
-    async getAllLikes({ users }: SearchLikeInput, pagination: PaginationLikeInput): Promise<Like[]> {
-        let userLikes = await this.likeModel.find({ users: { $in: users }})
-            .skip(pagination.offset)
-            .limit(pagination.limit)
-            .sort([[pagination.orderBy, pagination.order]])
-        userLikes.map(userLike => userLike.users = users)
-        return userLikes
-    }
-
-    async getPostLikes({ post }: SearchLikeInput): Promise<Like> {
-        return await this.likeModel.findOneAndUpdate({ post }, { post }, { upsert: true, useFindAndModify: false, new: true })
-    }
-
-    async add({ user, post }: LikeInput): Promise<Like> {
-        let like = await this.likeModel.findOneAndUpdate({ post }, { post }, { upsert: true })
-        like = await this.likeModel.findOneAndUpdate({ users: { $nin: [user] },  post }, { $push: { users: user }, post }, { useFindAndModify: false, new: true })
-        if(!like)
-            return await this.likeModel.findOneAndUpdate({ users: { $in: [user] }, post }, { $pull: { users: user }, post }, { useFindAndModify: false, new: true })
-        return like
+    private sortByDate(comments: Like[], order: Order = Order.DESC){
+        if(Number(Order[order]) == Order.ASC)
+            return comments.sort((a,b) => a.createdAt > b.createdAt ? 1 : -1)
+        else if(Number(Order[order]) == Order.DESC)
+            return comments.sort((a,b) => a.createdAt < b.createdAt ? 1 : -1)
+        return comments
     }
 }
-*/

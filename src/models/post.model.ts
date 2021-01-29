@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 import { Comment, Comments } from './comment.model';
+import { Likes, Like } from './like.model';
 
 @Schema({ timestamps: true, versionKey: false })
 export class Post extends Document {
@@ -18,6 +19,9 @@ export class Post extends Document {
 
     @Prop({ type: [Comments], autopopulate: true })
     comments: Comment[]
+
+    @Prop({ type: [Likes], autopopulate: true })
+    likes: Like[]
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

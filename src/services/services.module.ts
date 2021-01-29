@@ -8,6 +8,7 @@ import { CollectionService } from './collection.service';
 import { CommentService } from './comment.service';
 import { FollowService } from './follow.service';
 import { NotificationService } from './notification.service';
+import { LikeService } from './like.service';
 
 @Module({
     imports: [
@@ -20,7 +21,8 @@ import { NotificationService } from './notification.service';
         CollectionService,
         CommentService,
         FollowService,
-        NotificationService
+        NotificationService,
+        LikeService
     ],
     exports: [
         UserService,
@@ -29,7 +31,8 @@ import { NotificationService } from './notification.service';
         CollectionService,
         CommentService,
         FollowService,
-        NotificationService
+        NotificationService,
+        LikeService
     ]
 })
 export class ServicesModule {}
