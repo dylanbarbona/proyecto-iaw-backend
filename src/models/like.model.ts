@@ -9,5 +9,5 @@ export interface Like {
 }
 
 export const Likes = new MongooseSchema({
-    user: { type: MongooseSchema.Types.ObjectId, ref: 'User', required: true, unique: true, autopopulate: true },
+    user: { type: MongooseSchema.Types.ObjectId, ref: 'User', required: true, unique: true, autopopulate: false },
 }, { timestamps: true, versionKey: false });

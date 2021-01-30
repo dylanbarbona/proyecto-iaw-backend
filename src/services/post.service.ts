@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Mongoose, mongo } from 'mongoose';
 import { SearchPostInput, CreatePostInput, UpdatePostInput } from '../inputs/post.input';
 import { Post } from '../models/post.model';
+import { User } from '../models/user.model';
 
 @Injectable()
 export class PostService {
@@ -14,7 +15,8 @@ export class PostService {
 
     constructor(@InjectModel('Post') readonly PostModel: Model<Post>){ }
 
-    async getFollowingPosts(followings: string[], search: SearchPostInput): Promise<Post[]>{
+    async getFollowingPosts(user: User, search: SearchPostInput): Promise<Post[]>{
+        const followings = user.followings.map(following => following._id)
         return await this.PostModel.find(
             { 
                 user: { $in: followings }, 
@@ -38,11 +40,10 @@ export class PostService {
             .skip(Number(search.skip) || this.SKIP)
     }
 
-    /*
     async getPostByDescription(search: SearchPostInput): Promise<Post[]>{
         return await this.PostModel.find(
             { 
-                $text: { $search: search.description },
+                //$text: { $search: search.description },
                 createdAt: { 
                     $gte: search.createdAt_min || this.MIN_DATE, 
                     $lt: search.createdAt_max || this.MAX_DATE 
@@ -55,7 +56,6 @@ export class PostService {
             .limit(Number(search.limit) || this.LIMIT )    
             .skip(Number(search.skip) || this.SKIP)
     }
-    */
 
     async getPostByUser(search: SearchPostInput): Promise<Post[]>{
         return await this.PostModel.find(

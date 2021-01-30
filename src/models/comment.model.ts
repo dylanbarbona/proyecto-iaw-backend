@@ -10,6 +10,6 @@ export interface Comment {
 }
 
 export const Comments = new MongooseSchema({
-    user: { type: MongooseSchema.Types.ObjectId, ref: 'User', required: true, autopopulate: true },
+    user: { type: MongooseSchema.Types.ObjectId, ref: 'User', required: true, autopopulate: false },
     text: { type: String, required: true }
 }, { timestamps: true, versionKey: false });

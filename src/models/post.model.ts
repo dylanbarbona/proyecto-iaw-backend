@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 import { Comment, Comments } from './comment.model';
 import { Likes, Like } from './like.model';
+import { Metadata, MetadataSchema } from './metadata.model';
 
 @Schema({ timestamps: true, versionKey: false })
 export class Post extends Document {
@@ -14,8 +15,8 @@ export class Post extends Document {
     @Prop({ default: "" })
     description: String
 
-    @Prop({ type: MongooseSchema.Types.Array })
-    urls: String[]
+     @Prop({ type: [MetadataSchema], autopopulate: true })
+    metadata: Metadata[]
 
     @Prop({ type: [Comments], autopopulate: true })
     comments: Comment[]
