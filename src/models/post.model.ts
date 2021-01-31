@@ -15,13 +15,13 @@ export class Post extends Document {
     @Prop({ default: "" })
     description: String
 
-     @Prop({ type: [MetadataSchema], autopopulate: true })
+     @Prop({ type: [MetadataSchema]})
     metadata: Metadata[]
 
-    @Prop({ type: [Comments], autopopulate: true })
+    @Prop({ type: [Comments] })
     comments: Comment[]
 
-    @Prop({ type: [Likes], autopopulate: true })
+    @Prop({ type: [Likes] })
     likes: Like[]
 }
 

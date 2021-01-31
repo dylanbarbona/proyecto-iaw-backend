@@ -4,43 +4,46 @@ import { Model } from 'mongoose';
 import { PostService } from './post.service';
 import { CreateCommentInput, DeleteCommentInput, UpdateCommentInput, SearchCommentInput } from '../inputs/comment.input';
 import { Post } from '../models/post.model';
-import { Comment } from '../models/comment.model';
-import { Order } from '../utils/order';
+import { Comment, Comments } from '../models/comment.model';
+import { Order } from '../utils/utils';
 
 @Injectable()
 export class CommentService {
+    private COMMENTS = 'comments.user'
+    private SELECTED_FIELDS = '_id username name email profile_photo'
+
+    constructor(@InjectModel('Post') readonly PostModel: Model<Post>){ }
     
-    async get(post: Post, order: Order = Order.DESC){
-        return this.sortByDate(post.comments, order)
+    async get(_id: String): Promise<Comment[]>{
+        const post = await this.PostModel.findById(_id)
+            .populate({ path: this.COMMENTS, select: this.SELECTED_FIELDS })
+        return post.comments
     }
 
-    async create(post: Post, input: CreateCommentInput): Promise<Post>{
-        post.comments.push(input)
-        post.comments = this.sortByDate(post.comments)
-        return await post.save()
+    async create(_id: String, input: CreateCommentInput): Promise<Comment[]>{
+        const post = await this.PostModel.findByIdAndUpdate(
+            _id, 
+            { $push: { comments: input }}, 
+            { useFindAndModify: false, new: true }
+        )
+        return post.comments
     }
 
-    async update(post: Post, id_comment: string, input: UpdateCommentInput): Promise<Post>{
-        post.comments.forEach(comment => {
-            if(comment._id == id_comment)
-                comment.text = input.text
-        })
-        post.comments = this.sortByDate(post.comments)
-        return await post.save()
+    async update(_id: String, search: SearchCommentInput, input: UpdateCommentInput): Promise<Comment[]>{
+        const post = await this.PostModel.findOneAndUpdate(
+            { _id, comments: { $elemMatch: { _id: search._id, user: search.user }}}, 
+            { $set: { 'comments.$.text': input.text }},
+            { useFindAndModify: false, new: true }
+        )
+        return post.comments
     }
 
-    async delete(post: Post, input: DeleteCommentInput){
-        post.comments = post.comments.filter(item => 
-            !(item._id == input._id && (item.user['_id'] == input.user || post.user['_id'] == input.user)))
-        post.comments = this.sortByDate(post.comments)
-        return await post.save()
-    }
-
-    private sortByDate(comments: Comment[], order: Order = Order.DESC){
-        if(Number(Order[order]) == Order.ASC)
-            return comments.sort((a,b) => a.createdAt > b.createdAt ? 1 : -1)
-        else if(Number(Order[order]) == Order.DESC)
-            return comments.sort((a,b) => a.createdAt < b.createdAt ? 1 : -1)
-        return comments
+    async delete(_id: String, input: DeleteCommentInput): Promise<Comment[]>{
+        const post = await this.PostModel.findOneAndUpdate(
+            { _id, comments: { $elemMatch: { _id: input._id, user: input.user }}}, 
+            { $pull: { comments: input } },
+            { useFindAndModify: false, new: true }
+        )
+        return post.comments
     }
 }

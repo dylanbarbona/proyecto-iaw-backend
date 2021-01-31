@@ -1,29 +1,75 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { User } from '../models/user.model';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class FollowService {
+    private FOLLOWERS = 'followers.user'
+    private FOLLOWINGS = 'followings.user'
+    private SELECTED_FIELDS = '_id username name email profile_photo'
 
-    async getFollowers(user: User){
-        return await { followers: user.followers }
+    constructor(@InjectModel('User') readonly userModel: Model<User>){ }
+
+    async getFollowers(username: string){
+        const user = await this.userModel.findOne({ username })
+            .populate({ path: this.FOLLOWERS, select: this.SELECTED_FIELDS})
+        return user.followers
     }
 
-    async getFollowings(user: User){
-        return await { followings: user.followings }
+    async getFollowings(username: string){
+        const user = await this.userModel.findOne({ username })
+            .populate({ path: this.FOLLOWINGS, select: this.SELECTED_FIELDS })
+        return user.followings
     }
 
-    async follow(loggedUser: User, user: User){
-        let followingsIndex = loggedUser.followings.findIndex(following => following.user['_id'] == loggedUser._id)
-        let followersIndex = user.followers.findIndex(follower => follower.user['_id'] == user._id)
-        if(followingsIndex >= 0 && followersIndex >= 0){
-            loggedUser.followings = loggedUser.followings.splice(followingsIndex, 0)
-            user.followers = user.followers.splice(followersIndex, 0)
-        } else { 
-            loggedUser.followings.push({ user: user._id })
-            user.followers.push({ user: loggedUser._id })
+    async follow(loggedUsername: string, username: string){
+        if(loggedUsername == username)
+            throw new BadRequestException()
+        const session = await this.userModel.startSession()
+        let loggedUser = await this.userModel.findOne({ username: loggedUsername })
+        try {
+            session.startTransaction()
+            let user = await this.userModel.findOneAndUpdate(
+                { username, 'followers.user': { $nin: [loggedUser._id] } },
+                { $push: { followers: { user: loggedUser._id }}},
+                { useFindAndModify: false, new: true }
+            )
+            loggedUser = await this.userModel.findOneAndUpdate(
+                { username: loggedUsername, 'followings.user': { $nin: [user._id]}},
+                { $push: { followings: { user: user._id }}},
+                { useFindAndModify: false, new: true }
+            )
+            session.commitTransaction()
+        } catch(exception){
+            session.abortTransaction()
         }
-        user.save()
-        loggedUser.save()
-        return { followings: loggedUser.followings } 
+        loggedUser = await loggedUser.populate({ path: this.FOLLOWINGS, select: this.SELECTED_FIELDS }).execPopulate()
+        return loggedUser.followings
+    }
+
+    async unfollow(loggedUsername: string, username: string){
+        if(loggedUsername == username)
+            throw new BadRequestException()
+        const session = await this.userModel.startSession()
+        let loggedUser = await this.userModel.findOne({ username: loggedUsername })
+        try {
+            session.startTransaction()
+            let user = await this.userModel.findOneAndUpdate(
+                { username, 'followers.user': { $in: [loggedUser._id] } },
+                { $pull: { followers: { user: loggedUser._id }}},
+                { useFindAndModify: false, new: true }
+            )
+            loggedUser = await this.userModel.findOneAndUpdate(
+                { username: loggedUsername, 'followings.user': { $in: [user._id] } },
+                { $pull: { followings: { user: user._id }}},
+                { useFindAndModify: false, new: true }
+            )
+            session.commitTransaction()
+        } catch(exception){
+            session.abortTransaction()
+        }
+        loggedUser = await loggedUser.populate({ path: this.FOLLOWINGS, select: this.SELECTED_FIELDS }).execPopulate()
+        return loggedUser.followings
     }
 }

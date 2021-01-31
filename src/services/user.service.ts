@@ -4,28 +4,24 @@ import { Model } from 'mongoose';
 import { User } from '../models/user.model';
 import { CreateUserInput, SearchUserInput, UpdateUserInput } from '../inputs/user.input';
 import { UserDTO } from '../dto/user.dto';
+import { EMPTY_STRING, MAX_DATE, MIN_DATE, LIMIT, SKIP } from '../utils/utils'
+
 const bcrypt = require('bcrypt')
 
 @Injectable()
 export class UserService {
-    private readonly EMPTY_STRING = ''
-    private readonly MAX_DATE = new Date(8640000000000000);
-    private readonly MIN_DATE = new Date(-8640000000000000);
-    private readonly LIMIT = 10
-    private readonly SKIP = 0
-
     constructor(@InjectModel('User') readonly userModel: Model<User>){ }
 
     async getAll(search: SearchUserInput): Promise<User[]>{
         return await this.userModel.find({ 
-            name: { $regex:  `${search.name || this.EMPTY_STRING}` },
-            username: { $regex:  `${search.username || this.EMPTY_STRING}` },
-            email: { $regex:  `${search.email || this.EMPTY_STRING}` },
+            name: { $regex:  `${search.name || EMPTY_STRING}` },
+            username: { $regex:  `${search.username || EMPTY_STRING}` },
+            email: { $regex:  `${search.email || EMPTY_STRING}` },
             birthday: { 
-                $gte: search.birthday_min || this.MIN_DATE, 
-                $lt: search.birthday_max || this.MAX_DATE 
+                $gte: search.birthday_min || MIN_DATE, 
+                $lt: search.birthday_max || MAX_DATE 
             }
-        }).limit(Number(search.limit) || this.LIMIT).skip(Number(search.skip) || this.SKIP)
+        }).limit(Number(search.limit) || LIMIT).skip(Number(search.skip) || SKIP)
     }
 
     async get(search: SearchUserInput): Promise<User>{

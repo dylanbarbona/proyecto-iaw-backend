@@ -45,6 +45,6 @@ export class AuthController {
     @Get('profile')
     @UseGuards(JwtAuthGuard)
     async whoAmI(@Req() req: Request, @Res() res: Response){
-        res.status(HttpStatus.OK).json(req.user)
+        res.status(HttpStatus.OK).json(await this.userService.get({ _id: req.user['_id'] }))
     }
 }

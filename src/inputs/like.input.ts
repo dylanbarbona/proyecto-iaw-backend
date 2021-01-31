@@ -1,4 +1,12 @@
-export interface LikeInput {
+export interface CreateLikeInput {
     user: String
-    _id?: String
+}
+
+export interface UpdateLikeInput {
+    user: String
+}
+
+export interface SearchLikeInput {
+    user: String
+    _id: String
 }

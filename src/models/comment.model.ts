@@ -1,15 +1,12 @@
 import { Prop, Schema, SchemaFactory,  } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema, Model } from 'mongoose';
 
-export interface Comment {
+export class Comment extends Document{
     user: String
     text: String
-    _id?: String
-    updatedAt?: Date
-    createdAt?: Date
 }
 
 export const Comments = new MongooseSchema({
-    user: { type: MongooseSchema.Types.ObjectId, ref: 'User', required: true, autopopulate: false },
-    text: { type: String, required: true }
+    user: { type: MongooseSchema.Types.ObjectId, ref: 'User' },
+    text: { type: String }
 }, { timestamps: true, versionKey: false });
