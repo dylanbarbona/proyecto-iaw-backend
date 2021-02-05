@@ -7,7 +7,7 @@ import { NotificationService } from '../services/notification.service';
 import { NotificationEnum } from '../models/notification.model';
 
 @Injectable()
-export class CommentNotificationInterceptor implements NestInterceptor {
+export class FollowNotificationInterceptor implements NestInterceptor {
     private LIMIT = 3
 
     constructor(
@@ -16,30 +16,30 @@ export class CommentNotificationInterceptor implements NestInterceptor {
   
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         return next.handle().pipe(
-            tap(async (post) => {
-                const value = await this.getLastComments(post)
+            tap(async ({ loggedUser, user }) => {
+                const value = await this.getLastFollows(user)
                 if(value.length > 0){
-                    const notification = await this.createNotification(post)
-                    this.notificationGateway.sendNotification(post.user._id, notification, value)
+                    const notification = await this.createNotification(user, loggedUser)
+                    this.notificationGateway.sendNotification(user._id, notification, value)
                 }
             }),
-            map(post => post.comments[post.comments.length - 1])
+            map(({ loggedUser, user }) => { return { following: loggedUser.followings.slice(-1) }})
         );
     }
 
-    async createNotification(post){
-        const to = post.user._id
-        const origin = post._id
-        const type = NotificationEnum.COMMENT
+    async createNotification(user, loggedUser){
+        const to = user._id
+        const origin = loggedUser._id
+        const type = NotificationEnum.FOLLOW
         const search = { to, origin, type }
         const input = { to,  origin, type, viewed: false }
         return await this.notificationService.create(search, input)
     }
 
-    async getLastComments(post){
+    async getLastFollows(user){
         return {
-            length: post.comments.length,
-            comments: post.comments.slice(-this.LIMIT),
+            length: user.followers.length,
+            followers: user.followers.slice(-this.LIMIT),
         }
     }
 }

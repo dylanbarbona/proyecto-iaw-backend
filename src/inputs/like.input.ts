@@ -1,12 +1,12 @@
 export interface CreateLikeInput {
-    user: String
+    user: string
 }
 
 export interface UpdateLikeInput {
-    user: String
+    user: string
 }
 
 export interface SearchLikeInput {
-    user: String
-    _id: String
+    user: string
+    _id: string
 }

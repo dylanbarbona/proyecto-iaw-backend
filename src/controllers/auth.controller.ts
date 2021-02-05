@@ -1,7 +1,6 @@
 import { Controller, Post, Get, Put, Delete, Param, Body, Query, Req, Res, HttpCode, HttpStatus, UseGuards, HttpException } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { CreateUserInput, SearchUserInput, UpdateUserInput } from '../inputs/user.input';
-import { UserDTO } from '../dto/user.dto';
 import { AuthService } from '../auth/auth.service';
 import { EncryptPasswordPipe } from '../pipes/encrypt-password.pipe';
 import { User } from '../models/user.model';

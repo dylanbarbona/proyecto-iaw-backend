@@ -8,11 +8,10 @@ import { EMPTY_STRING, MAX_DATE, MIN_DATE, LIMIT, SKIP } from '../utils/utils'
 
 @Injectable()
 export class PostService {
-    constructor(@InjectModel('Post') readonly PostModel: Model<Post>){ }
+    constructor(@InjectModel('Post') readonly postModel: Model<Post>){ }
 
-    /*
     async getFollowingPosts(user: User, search: SearchPostInput): Promise<Post[]>{
-        return await this.PostModel.find(
+        return await this.postModel.find(
             { 
                 user: { $in: user.followings.map(following => following.user) }, 
                 createdAt: { 
@@ -27,17 +26,16 @@ export class PostService {
             .limit(Number(search.limit) || LIMIT )    
             .skip(Number(search.skip) || SKIP)
     }
-    */
 
     async getPostByCategory(search: SearchPostInput): Promise<Post[]>{
-        return await this.PostModel.find()
+        return await this.postModel.find()
             .where("categories").in(search.categories)
             .limit(Number(search.limit) || LIMIT )    
             .skip(Number(search.skip) || SKIP)
     }
 
     async getPostByDescription(search: SearchPostInput): Promise<Post[]>{
-        return await this.PostModel.find(
+        return await this.postModel.find(
             { 
                 //$text: { $search: search.description },
                 createdAt: { 
@@ -54,7 +52,7 @@ export class PostService {
     }
 
     async getPostByUser(search: SearchPostInput): Promise<Post[]>{
-        return await this.PostModel.find(
+        return await this.postModel.find(
             { 
                 user: search.user, 
                 createdAt: { 
@@ -71,18 +69,18 @@ export class PostService {
     }
 
     async get(search: SearchPostInput): Promise<Post>{
-        return await this.PostModel.findOne(search)
+        return await this.postModel.findOne(search)
     }
 
     async create(input: CreatePostInput): Promise<Post>{
-        return await new this.PostModel(input).save()
+        return await new this.postModel(input).save()
     }
 
     async update(search: SearchPostInput, input: UpdatePostInput): Promise<Post>{
-        return await this.PostModel.findOneAndUpdate(search, input, { new: true, useFindAndModify: false })
+        return await this.postModel.findOneAndUpdate(search, input, { new: true, useFindAndModify: false })
     }
 
     async delete(search: SearchPostInput): Promise<Post>{
-        return await this.PostModel.findOneAndDelete(search)
+        return await this.postModel.findOneAndDelete(search)
     }
 }

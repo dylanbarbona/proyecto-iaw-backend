@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory,  } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema, Model } from 'mongoose';
 
 export interface Follower {
-    user: String
+    user: string
 }
 
 export const Followers = new MongooseSchema({
@@ -10,7 +10,7 @@ export const Followers = new MongooseSchema({
 }, { versionKey: false, _id: false });
 
 export interface Following {
-    user: String
+    user: string
 }
 
 export const Followings = new MongooseSchema({

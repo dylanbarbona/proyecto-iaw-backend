@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CommentNotificationInterceptor } from './comment-notification.interceptor';
 import { GatewaysModule } from '../gateways/gateways.module';
 import { ServicesModule } from '../services/services.module';
+import { LikeNotificationInterceptor } from './like-notification.interceptor';
 
 @Module({
     imports: [
@@ -9,10 +10,12 @@ import { ServicesModule } from '../services/services.module';
         GatewaysModule
     ],
     providers: [
-        CommentNotificationInterceptor
+        CommentNotificationInterceptor,
+        LikeNotificationInterceptor,
     ],
     exports: [
-        CommentNotificationInterceptor
+        CommentNotificationInterceptor,
+        LikeNotificationInterceptor,
     ]
 })
 export class InterceptorsModule {}

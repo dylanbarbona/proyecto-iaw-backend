@@ -3,7 +3,6 @@ import { Metadata } from "../models/metadata.model";
 import { NotificationEnum } from "src/models/notification.model";
 
 export interface CreateNotificationInput {
-    from: string
     to: string
     viewed: boolean
     origin: string
@@ -12,7 +11,6 @@ export interface CreateNotificationInput {
 
 export interface SearchNotificationInput {
     _id?: string
-    from?: string[]
     to: string
     viewed?: boolean
     origin?: string

@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../models/user.model';
 import { CreateUserInput, SearchUserInput, UpdateUserInput } from '../inputs/user.input';
-import { UserDTO } from '../dto/user.dto';
 import { EMPTY_STRING, MAX_DATE, MIN_DATE, LIMIT, SKIP } from '../utils/utils'
 
 const bcrypt = require('bcrypt')

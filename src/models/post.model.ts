@@ -21,7 +21,7 @@ export class Post extends Document {
     @Prop({ type: [Comments] })
     comments: Comment[]
 
-    @Prop({ type: [Likes] })
+    @Prop({ type: [Likes], default: [] })
     likes: Like[]
 }
 

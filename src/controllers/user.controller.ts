@@ -5,7 +5,6 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { JwtAuthGuard, Roles } from '../auth/jwt.guard';
 import { UserService } from '../services/user.service';
 import { CreateUserInput, SearchUserInput, UpdateUserInput } from '../inputs/user.input';
-import { UserDTO } from '../dto/user.dto';
 import { EncryptPasswordPipe } from 'src/pipes/encrypt-password.pipe';
 
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';

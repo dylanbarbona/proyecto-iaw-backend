@@ -11,31 +11,27 @@ export class LikeService {
     private LIKES = 'likes.user'
     private SELECTED_FIELDS = '_id username name email profile_photo'
 
-    constructor(@InjectModel('Post') readonly PostModel: Model<Post>){ }
+    constructor(@InjectModel('Post') readonly postModel: Model<Post>){ }
 
     async get(_id: String): Promise<Like[]>{
-        const post = await this.PostModel.findById(_id)
+        const post = await this.postModel.findById(_id)
             .populate({ path: this.LIKES, select: this.SELECTED_FIELDS})
         return post.likes
     }
 
-    async like(_id: String, input: CreateLikeInput): Promise<Like[]>{
-       let post = await this.PostModel.findOneAndUpdate(
+    async like(_id: String, input: CreateLikeInput): Promise<Post>{
+        return await this.postModel.findOneAndUpdate(
             { _id, likes: { $not: { $elemMatch: input }}},
             { $push: { likes: input }},
             { useFindAndModify: false, new: true }
-        )
-        post = await this.PostModel.findById(_id).populate({ path: this.LIKES, select: this.SELECTED_FIELDS })
-        return post.likes
+        ).populate({ path: this.LIKES, select: this.SELECTED_FIELDS })
     }
 
-    async unlike(_id: String, input: UpdateLikeInput): Promise<Like[]>{
-        let post = await this.PostModel.findOneAndUpdate(
+    async unlike(_id: String, input: UpdateLikeInput): Promise<Post>{
+        return await this.postModel.findOneAndUpdate(
             { _id, likes: { $elemMatch: input }},
             { $pull: { likes: input }},
             { useFindAndModify: false, new: true }
-        )
-        post = await this.PostModel.findById(_id).populate({ path: this.LIKES, select: this.SELECTED_FIELDS })
-        return post.likes
+        ).populate({ path: this.LIKES, select: this.SELECTED_FIELDS })
     }
 }

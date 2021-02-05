@@ -7,7 +7,7 @@ import { NotificationService } from '../services/notification.service';
 import { NotificationEnum } from '../models/notification.model';
 
 @Injectable()
-export class CommentNotificationInterceptor implements NestInterceptor {
+export class LikeNotificationInterceptor implements NestInterceptor {
     private LIMIT = 3
 
     constructor(
@@ -17,29 +17,30 @@ export class CommentNotificationInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         return next.handle().pipe(
             tap(async (post) => {
-                const value = await this.getLastComments(post)
+                const value = this.getLastLikes(post)
                 if(value.length > 0){
                     const notification = await this.createNotification(post)
                     this.notificationGateway.sendNotification(post.user._id, notification, value)
                 }
             }),
-            map(post => post.comments[post.comments.length - 1])
+            map(post => post.likes[post.likes.length - 1])
         );
     }
 
     async createNotification(post){
         const to = post.user._id
         const origin = post._id
-        const type = NotificationEnum.COMMENT
+        const type = NotificationEnum.LIKE
         const search = { to, origin, type }
         const input = { to,  origin, type, viewed: false }
         return await this.notificationService.create(search, input)
     }
 
-    async getLastComments(post){
+    getLastLikes(post){
+        const length = post.likes.length
         return {
-            length: post.comments.length,
-            comments: post.comments.slice(-this.LIMIT),
+            length,
+            likes: post.likes.slice(-this.LIMIT)
         }
     }
 }

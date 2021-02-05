@@ -34,18 +34,20 @@ export class FollowService {
                 { username, 'followers.user': { $nin: [loggedUser._id] } },
                 { $push: { followers: { user: loggedUser._id }}},
                 { useFindAndModify: false, new: true }
-            )
+            ).populate({ path: this.FOLLOWERS, select: this.SELECTED_FIELDS })
+
             loggedUser = await this.userModel.findOneAndUpdate(
                 { username: loggedUsername, 'followings.user': { $nin: [user._id]}},
                 { $push: { followings: { user: user._id }}},
                 { useFindAndModify: false, new: true }
-            )
+            ).populate({ path: this.FOLLOWINGS, select: this.SELECTED_FIELDS })
             session.commitTransaction()
+            return { loggedUser, user }
         } catch(exception){
             session.abortTransaction()
         }
         loggedUser = await loggedUser.populate({ path: this.FOLLOWINGS, select: this.SELECTED_FIELDS }).execPopulate()
-        return loggedUser.followings
+        return { loggedUser }
     }
 
     async unfollow(loggedUsername: string, username: string){
@@ -53,23 +55,27 @@ export class FollowService {
             throw new BadRequestException()
         const session = await this.userModel.startSession()
         let loggedUser = await this.userModel.findOne({ username: loggedUsername })
+        let user = await this.userModel.findOne({ username })
         try {
             session.startTransaction()
             let user = await this.userModel.findOneAndUpdate(
                 { username, 'followers.user': { $in: [loggedUser._id] } },
                 { $pull: { followers: { user: loggedUser._id }}},
                 { useFindAndModify: false, new: true }
-            )
+            ).populate({ path: this.FOLLOWERS, select: this.SELECTED_FIELDS })
+
             loggedUser = await this.userModel.findOneAndUpdate(
                 { username: loggedUsername, 'followings.user': { $in: [user._id] } },
                 { $pull: { followings: { user: user._id }}},
                 { useFindAndModify: false, new: true }
-            )
+            ).populate({ path: this.FOLLOWINGS, select: this.SELECTED_FIELDS })
+
             session.commitTransaction()
+            return { loggedUser, user }
         } catch(exception){
             session.abortTransaction()
         }
         loggedUser = await loggedUser.populate({ path: this.FOLLOWINGS, select: this.SELECTED_FIELDS }).execPopulate()
-        return loggedUser.followings
+        return { loggedUser }
     }
 }

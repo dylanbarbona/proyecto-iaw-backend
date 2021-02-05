@@ -5,7 +5,6 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { ConfigurationModule } from './config/config.module';
 import { DatabaseModule } from './database/database.module';
 import { ControllersModule } from './controllers/controllers.module';
-import { DecoratorsModule } from './decorators/decorators.module';
 import { ModelsModule } from './models/models.module';
 import { ServicesModule } from './services/services.module';
 import { AuthModule } from './auth/auth.module';
@@ -18,7 +17,6 @@ import { InterceptorsModule } from './interceptors/interceptors.module';
     ControllersModule,
     DatabaseModule, 
     CloudinaryModule, 
-    DecoratorsModule, 
     AuthModule
   ],
   controllers: [AppController],

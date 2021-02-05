@@ -20,29 +20,27 @@ export class CommentService {
         return post.comments
     }
 
-    async create(_id: String, input: CreateCommentInput){
+    async create(_id: String, input: CreateCommentInput): Promise<Post>{
         return await this.PostModel.findByIdAndUpdate(
             _id, 
             { $push: { comments: input }}, 
             { useFindAndModify: false, new: true }
-        ).populate('comments.user', '_id name username profile_photo')
+        ).populate(this.COMMENTS, this.SELECTED_FIELDS)
     }
 
-    async update(_id: String, search: SearchCommentInput, input: UpdateCommentInput): Promise<Comment[]>{
-        const post = await this.PostModel.findOneAndUpdate(
+    async update(_id: String, search: SearchCommentInput, input: UpdateCommentInput): Promise<Post>{
+        return await this.PostModel.findOneAndUpdate(
             { _id, comments: { $elemMatch: { _id: search._id, user: search.user }}}, 
             { $set: { 'comments.$.text': input.text }},
             { useFindAndModify: false, new: true }
-        )
-        return post.comments
+        ).populate(this.COMMENTS, this.SELECTED_FIELDS)
     }
 
-    async delete(_id: String, input: DeleteCommentInput): Promise<Comment[]>{
-        const post = await this.PostModel.findOneAndUpdate(
+    async delete(_id: String, input: DeleteCommentInput): Promise<Post>{
+        return await this.PostModel.findOneAndUpdate(
             { _id, comments: { $elemMatch: { _id: input._id, user: input.user }}}, 
             { $pull: { comments: input } },
             { useFindAndModify: false, new: true }
-        )
-        return post.comments
+        ).populate(this.COMMENTS, this.SELECTED_FIELDS)
     }
 }

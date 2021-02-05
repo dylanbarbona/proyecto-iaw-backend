@@ -33,7 +33,6 @@ export class PostController {
         return await this.postService.getPostByDescription(search)
     }
 
-    /*
     @Get('search/followings')
     @Roles(Role.USER_ROLE)
     @UseGuards(JwtAuthGuard, RolesGuard)
@@ -41,7 +40,6 @@ export class PostController {
         const user = req.user
         return await this.postService.getFollowingPosts(user, search)
     }
-    */
 
     @Get(':id')
     async findOne(@Param('id') _id: string){

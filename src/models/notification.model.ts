@@ -11,9 +11,6 @@ export enum NotificationEnum {
 
 @Schema({ timestamps: true })
 export class Notification extends Document{
-    @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'User', nullable: false }])
-    from: string[]
-
     @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', nullable: false })
     to: string
 
