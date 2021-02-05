@@ -1,6 +1,7 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
+var cookie = require('cookie');
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -10,6 +11,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                 let token = null;
                 if (req && req.cookies)
                     token = req.cookies['access_token'];
+                else if(req.handshake)
+                    token = cookie.parse(req.handshake.headers.cookie).access_token
                 return token
             },
             signOptions: { expiresIn: '3600s' },

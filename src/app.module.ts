@@ -9,6 +9,7 @@ import { DecoratorsModule } from './decorators/decorators.module';
 import { ModelsModule } from './models/models.module';
 import { ServicesModule } from './services/services.module';
 import { AuthModule } from './auth/auth.module';
+import { GatewaysModule } from './gateways/gateways.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { AuthModule } from './auth/auth.module';
     DatabaseModule, 
     CloudinaryModule, 
     DecoratorsModule, 
-    AuthModule
+    AuthModule,
+    GatewaysModule
   ],
   controllers: [AppController],
   providers: [AppService],
