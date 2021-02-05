@@ -11,17 +11,17 @@ export enum NotificationEnum {
 
 @Schema({ timestamps: true })
 export class Notification extends Document{
-    @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'User', nullable: false, autopopulate: true }])
+    @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'User', nullable: false }])
     from: string[]
 
-    @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', nullable: false, autopopulate: true })
+    @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', nullable: false })
     to: string
 
     @Prop({ type: Boolean, nullable: false, default: false })
     viewed: boolean
 
-    @Prop({ type: String, nullable: false })
-    text: string
+    @Prop({ type: MongooseSchema.Types.ObjectId })
+    origin: string
 
     @Prop({ nullable: false })
     type: NotificationEnum

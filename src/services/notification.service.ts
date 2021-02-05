@@ -5,23 +5,37 @@ import { Notification } from '../models/notification.model'
 import { 
     SearchNotificationInput, 
     CreateNotificationInput, 
-    UpdateNotificationInput, 
     DeleteNotificationInput } from '../inputs/notification.input';
 
 @Injectable()
 export class NotificationService {
-    constructor(@InjectModel('Post') readonly notificationModel: Model<Notification>){ }
+    constructor(@InjectModel('Notification') readonly notificationModel: Model<Notification>){ }
 
     async get(search: SearchNotificationInput){
         return await this.notificationModel.find(search)
     }
 
-    async create(input: CreateNotificationInput){
-        return await new this.notificationModel(input).save()
-    }
-
-    async update(search: SearchNotificationInput, input: UpdateNotificationInput){
-        return await this.notificationModel.findOneAndUpdate(search, input, { new: true, useFindAndModify: false })
+    async create(search: SearchNotificationInput, input: CreateNotificationInput){
+        return await this.notificationModel.findOneAndUpdate(
+            {
+                to: search.to,
+                origin: search.origin,
+                type: search.type
+            }, 
+            {
+                $addToSet: { from: input.from },
+                to: input.to,
+                viewed: input.viewed,
+                origin: input.origin,
+                type: input.type
+            },
+            { 
+                new: true, 
+                useFindAndModify: false, 
+                upsert: true 
+            })
+            .populate('from', '_id username name profile_photo')
+            .populate('to', '_id username name profile_photo')
     }
 
     async delete(input: DeleteNotificationInput){

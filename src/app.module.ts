@@ -10,6 +10,7 @@ import { ModelsModule } from './models/models.module';
 import { ServicesModule } from './services/services.module';
 import { AuthModule } from './auth/auth.module';
 import { GatewaysModule } from './gateways/gateways.module';
+import { InterceptorsModule } from './interceptors/interceptors.module';
 
 @Module({
   imports: [
@@ -18,8 +19,7 @@ import { GatewaysModule } from './gateways/gateways.module';
     DatabaseModule, 
     CloudinaryModule, 
     DecoratorsModule, 
-    AuthModule,
-    GatewaysModule
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

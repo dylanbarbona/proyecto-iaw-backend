@@ -1,24 +1,24 @@
 export interface CreateCommentInput {
-    user: String
-    text: String
+    user: string
+    text: string
 }
 
 export interface SearchCommentInput {
-    _id?: String
-    user?: String
+    _id?: string
+    user?: string
     createdAt_max?: Date
     createdAt_min?: Date
     updatedAt_max?: Date
     updatedAt_min?: Date
-    limit?: Number
-    skip?: Number
+    limit?: number
+    skip?: number
 }
 
 export interface UpdateCommentInput {
-    text: String
+    text: string
 }
 
 export interface DeleteCommentInput {
-    _id: String
-    user: String
+    _id: string
+    user: string
 }

@@ -7,6 +7,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { CreateCommentInput } from '../inputs/comment.input';
 import { Request } from 'express'
 import { Order } from '../utils/utils';
+import { CommentNotificationInterceptor } from '../interceptors/comment-notification.interceptor';
 
 @Controller('post')
 export class CommentController {
@@ -20,9 +21,10 @@ export class CommentController {
     @Post(':id/comment')
     @Roles(Role.USER_ROLE)
     @UseGuards(JwtAuthGuard, RolesGuard)
+    @UseInterceptors(CommentNotificationInterceptor)
     async create(@Param('id') _id: string, @Req() req: Request, @Body() input: CreateCommentInput){
         input.user = req.user['_id']
-        return { comments: await this.commentService.create(_id, input) }
+        return await this.commentService.create(_id, input)
     }
 
     @Put(':id/comment/:id_comment')

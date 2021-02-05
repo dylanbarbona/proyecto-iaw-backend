@@ -20,13 +20,12 @@ export class CommentService {
         return post.comments
     }
 
-    async create(_id: String, input: CreateCommentInput): Promise<Comment[]>{
-        const post = await this.PostModel.findByIdAndUpdate(
+    async create(_id: String, input: CreateCommentInput){
+        return await this.PostModel.findByIdAndUpdate(
             _id, 
             { $push: { comments: input }}, 
             { useFindAndModify: false, new: true }
-        )
-        return post.comments
+        ).populate('comments.user', '_id name username profile_photo')
     }
 
     async update(_id: String, search: SearchCommentInput, input: UpdateCommentInput): Promise<Comment[]>{

@@ -3,11 +3,10 @@ import { Metadata } from "../models/metadata.model";
 import { NotificationEnum } from "src/models/notification.model";
 
 export interface CreateNotificationInput {
-    _id?: string
-    from: string[]
+    from: string
     to: string
     viewed: boolean
-    text: string
+    origin: string
     type: NotificationEnum
 }
 
@@ -16,7 +15,7 @@ export interface SearchNotificationInput {
     from?: string[]
     to: string
     viewed?: boolean
-    text?: string
+    origin?: string
     type?: NotificationEnum
     createdAt_max?: Date
     createdAt_min?: Date
@@ -24,13 +23,6 @@ export interface SearchNotificationInput {
     updatedAt_min?: Date
     limit?: number
     skip?: number
-}
-
-export interface UpdateNotificationInput {
-    _id?: string
-    from?: string[]
-    viewed?: boolean
-    text?: string
 }
 
 export interface DeleteNotificationInput {

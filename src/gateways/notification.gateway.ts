@@ -14,20 +14,17 @@ import { Roles, JwtAuthGuard } from '../auth/jwt.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { UseGuards, Req } from '@nestjs/common';
 import { Role } from '../models/user.model';
-import { UserService } from 'src/services/user.service';
+import { UserService } from '../services/user.service';
+import { Notification } from '../models/notification.model';
 
 @WebSocketGateway()
 export class NotificationGateway implements OnGatewayConnection, OnGatewayDisconnect{
-    constructor(private readonly userService: UserService){ }
-
     @WebSocketServer()
     server: Server;
 
-    @SubscribeMessage('send_message')
-    @Roles(Role.USER_ROLE)
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    handleEvent(client: Socket, data: any) {
-        client.to(data.to).emit('receive_message', { from: client['user']._id, message: data.message })
+    @SubscribeMessage('send_notification')
+    sendNotification(to: string, notification: Notification, value: any) {
+        this.server.to(to).emit('receive_notification', { notification, value })
     }
 
     @Roles(Role.USER_ROLE)

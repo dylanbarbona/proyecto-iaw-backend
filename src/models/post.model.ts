@@ -7,13 +7,13 @@ import { Metadata, MetadataSchema } from './metadata.model';
 @Schema({ timestamps: true, versionKey: false })
 export class Post extends Document {
     @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true, autopopulate: true })
-    user: String
+    user: string
   
     @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Category', required: true, autopopulate: true }])
-    categories: String[]
+    categories: string[]
 
     @Prop({ default: "" })
-    description: String
+    description: string
 
      @Prop({ type: [MetadataSchema]})
     metadata: Metadata[]

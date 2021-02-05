@@ -4,7 +4,7 @@ import { Roles, JwtAuthGuard } from '../auth/jwt.guard';
 import { Role } from '../models/user.model';
 import { RolesGuard } from '../auth/roles.guard';
 import { NotificationService } from '../services/notification.service';
-import { SearchNotificationInput, CreateNotificationInput, UpdateNotificationInput } from '../inputs/notification.input';
+import { SearchNotificationInput, CreateNotificationInput } from '../inputs/notification.input';
 
 @Controller('notifications')
 export class NotificationController {
@@ -16,21 +16,6 @@ export class NotificationController {
     async getAll(@Query() search: SearchNotificationInput, @Req() req) {
         search.to = req.user['_id']
         return await this.notificationService.get(search)
-    }
-
-    @Post()
-    @Roles(Role.ADMIN_ROLE)
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    async create(@Body() input: CreateNotificationInput, @Req() req){
-        input.to = req.user['_id']
-        return await this.notificationService.create(input)
-    }
-
-    @Put('id')
-    @Roles(Role.ADMIN_ROLE)
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    async update(@Param('id') _id: string, @Body() input: UpdateNotificationInput, @Req() req){
-        return await this.notificationService.update({ _id, to: req.user['_id'] }, input)
     }
 
     @Delete('id')

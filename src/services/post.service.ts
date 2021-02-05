@@ -10,6 +10,7 @@ import { EMPTY_STRING, MAX_DATE, MIN_DATE, LIMIT, SKIP } from '../utils/utils'
 export class PostService {
     constructor(@InjectModel('Post') readonly PostModel: Model<Post>){ }
 
+    /*
     async getFollowingPosts(user: User, search: SearchPostInput): Promise<Post[]>{
         return await this.PostModel.find(
             { 
@@ -26,6 +27,7 @@ export class PostService {
             .limit(Number(search.limit) || LIMIT )    
             .skip(Number(search.skip) || SKIP)
     }
+    */
 
     async getPostByCategory(search: SearchPostInput): Promise<Post[]>{
         return await this.PostModel.find()

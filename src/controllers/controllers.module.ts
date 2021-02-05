@@ -15,13 +15,17 @@ import { NotificationController } from './notification.controller';
 import { LikeController } from './like.controller';
 import { FollowController } from './follow.controller';
 import { CommentController } from './comment.controller';
+import { InterceptorsModule } from '../interceptors/interceptors.module';
+import { GatewaysModule } from '../gateways/gateways.module';
 
 @Module({
     imports: [ 
         ModelsModule,
         ServicesModule,
         AuthModule,
-        CloudinaryModule
+        CloudinaryModule,
+        InterceptorsModule,
+        GatewaysModule
     ],
     controllers: [
         AuthController,

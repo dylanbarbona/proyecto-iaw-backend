@@ -2,8 +2,8 @@ import { Prop, Schema, SchemaFactory,  } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema, Model } from 'mongoose';
 
 export class Comment extends Document{
-    user: String
-    text: String
+    user: string
+    text: string
 }
 
 export const Comments = new MongooseSchema({
