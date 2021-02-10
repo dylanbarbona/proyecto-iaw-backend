@@ -1,6 +1,5 @@
-import { Controller, Query, Res, Get, HttpStatus, Param, Post, UseGuards, Body, Delete, Req, Put, UseInterceptors, UploadedFiles, UnauthorizedException } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { Controller, Query, Get, Param, Post, UseGuards, Body, Delete, Req, Put, UseInterceptors } from '@nestjs/common';
+import { Request } from 'express';
 
 import { SearchPostInput, CreatePostInput, UpdatePostInput } from '../inputs/post.input';
 
@@ -10,7 +9,10 @@ import { Role } from '../models/user.model';
 
 import { PostService } from '../services/post.service';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
-import { Metadata } from '../models/metadata.model';
+import { DeletePhotosInterceptor } from '../interceptors/delete-photo.interceptor';
+import { CloudinaryFile } from 'src/cloudinary/cloudinary.interface';
+
+let fs = require('fs')
 
 @Controller('post')
 export class PostController {
@@ -49,21 +51,18 @@ export class PostController {
     @Post()
     @Roles(Role.USER_ROLE)
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @UseInterceptors(FilesInterceptor("files", Number.MAX_VALUE, { dest: "./uploads" }))
-    async create(@Body() input: CreatePostInput, @UploadedFiles() files, @Req() req: Request){
-        const metadata = await this.submitFiles(files)
+    async create(@Body() { files, ...input }: CreatePostInput, @Req() req){
+        input.metadata = await this.saveFiles(files)
         input.user = req.user['_id']
-        input.metadata = metadata
         return await this.postService.create(input)
     }
 
     @Put(':id')
     @Roles(Role.USER_ROLE)
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @UseInterceptors(FilesInterceptor("files", Number.MAX_VALUE, { dest: "./uploads" }))
-    async update(@Param('id') _id: string, @Body() input: UpdatePostInput, @UploadedFiles() files: File[], @Req() req: Request){
-        const metadata = await this.submitFiles(files)
-        input.user = req.user['_id']
+    async update(@Param('id') _id: string, @Body() { files, ...input }: UpdatePostInput, @Req() req){
+        const metadata = await this.saveFiles(files)
+        input.deleteFiles.forEach(async public_id => await this.cloudinaryService.delete(public_id))
         input.metadata = metadata
         return await this.postService.update({ _id, user: req.user['_id'] }, input)
     }
@@ -71,16 +70,33 @@ export class PostController {
     @Delete(':id')
     @Roles(Role.USER_ROLE)
     @UseGuards(JwtAuthGuard, RolesGuard)
+    @UseInterceptors(DeletePhotosInterceptor)
     async remove(@Param('id') _id: string, @Req() req: Request){
         return await this.postService.delete({ _id, user: req.user['_id'] })
     }
 
-    private async submitFiles(files: File[]): Promise<Metadata[]>{
-        let metadata: Metadata[] = []
-        for(const file of files){
-            const cloudFile = await this.cloudinaryService.submitFile(file)
-            metadata.push(cloudFile)
-        }
-        return metadata
+    private async saveFiles(photos: string[]): Promise<CloudinaryFile[]>{
+        const path = 'uploads/'
+        const filesDecoded = photos.map(photo => this.decodeBase64Image(photo))
+        const metadataFiles = filesDecoded.map(({ format, resource_type, data }) => {
+            let filename = new Date(Date.now()).getTime() + Math.random() + '.' + format;
+            fs.writeFileSync(path + filename, data, 'base64');
+            return { path: path+filename, resource_type }
+        })
+
+        let cloudinaryFiles: CloudinaryFile[] = []
+        for(const { path, resource_type } of metadataFiles)
+            cloudinaryFiles.push(await this.cloudinaryService.submitFile(path, resource_type))
+        return cloudinaryFiles
+    }
+
+    private decodeBase64Image(dataString){
+        const matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
+        if (matches.length !== 3)
+            throw new Error('Invalid input string');
+        const format = matches[1].match(/.(gif|jpe?g|bmp|png)$/)[1]
+        const resource_type = matches[1].split('/')[0]
+        const data = Buffer.from(matches[2], 'base64')
+        return { format, resource_type, data }
     }
 }

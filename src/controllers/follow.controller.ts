@@ -10,17 +10,17 @@ import { FollowNotificationInterceptor } from 'src/interceptors/follow-notificat
 export class FollowController {
     constructor(private readonly followService: FollowService){}
 
-    @Get(':username/followers')
+    @Get('/followers/:username')
     async getFollowers(@Param('username') username: string){
         return { followers: await this.followService.getFollowers(username) }
     }
 
-    @Get(':username/followings')
+    @Get('/followings/:username')
     async getFollowings(@Param('username') username: string){
         return { followings: await this.followService.getFollowings(username) }
     }
 
-    @Post(':username/follow')
+    @Post('/follow/:username')
     @Roles(Role.USER_ROLE)
     @UseGuards(JwtAuthGuard, RolesGuard)
     @UseInterceptors(FollowNotificationInterceptor)

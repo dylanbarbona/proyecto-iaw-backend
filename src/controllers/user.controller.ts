@@ -12,6 +12,8 @@ import { CloudinaryFile } from '../cloudinary/cloudinary.interface';
 import { Role } from 'src/models/user.model';
 import { RolesGuard } from 'src/auth/roles.guard';
 
+let fs = require('fs')
+
 @Controller('user')
 export class UserController {
     constructor(
@@ -37,10 +39,9 @@ export class UserController {
 
     @Put()
     @UseGuards(JwtAuthGuard)
-    @UseInterceptors(FileInterceptor("file", { dest: "./uploads" }))
-    async update(@Body(EncryptPasswordPipe) input: UpdateUserInput, @UploadedFile() file, @Req() req: Request){
-        const profile_photo = await this.submitProfilePhoto(file)
-        return await this.userService.update({ _id: req.user['_id'] }, { ...input, profile_photo})
+    async update(@Body(EncryptPasswordPipe) { file, ...input }: UpdateUserInput, @Req() req: Request){
+        const cloudinaryFile = await this.saveFiles(file) || { secure_url: 'NO_PHOTO' }
+        return await this.userService.update({ _id: req.user['_id'] }, { ...input, profile_photo: cloudinaryFile.secure_url })
     }
 
     @Delete()
@@ -50,10 +51,21 @@ export class UserController {
         res.redirect('/auth/logout')
     }
 
-    private async submitProfilePhoto(file: File): Promise<string>{
-        if(!file)
-            return 'NO_PHOTO'
-        let cloudFile = await this.cloudinaryService.submitFile(file)
-        return cloudFile.secure_url
+    private async saveFiles(photo: string): Promise<CloudinaryFile>{
+        const path = 'uploads/'
+        const fileDecoded = this.decodeBase64Image(photo)
+        let filename = new Date(Date.now()).getTime() + Math.random() + '.' + fileDecoded.format;
+        fs.writeFileSync(path + filename, fileDecoded.data, 'base64')
+        return await this.cloudinaryService.submitFile(path + filename, fileDecoded.resource_type)
+    }
+
+    private decodeBase64Image(dataString){
+        const matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
+        if (matches.length !== 3)
+            throw new Error('Invalid input string');
+        const format = matches[1].match(/.(gif|jpe?g|bmp|png)$/)[1]
+        const resource_type = matches[1].split('/')[0]
+        const data = Buffer.from(matches[2], 'base64')
+        return { format, resource_type, data }
     }
 }

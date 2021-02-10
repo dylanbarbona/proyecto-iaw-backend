@@ -20,7 +20,7 @@ export class AuthController {
         @Res({ passthrough: true }) res: Response) {
             const user = await this.authService.validateUser(input.username, input.email, input.password)
             const { token } = await this.authService.login(user['_doc'])
-            res.cookie('access_token', token, { httpOnly: true }).status(HttpStatus.CREATED).json({ ok: true })
+            res.cookie('access_token', token).status(HttpStatus.CREATED).json({ ok: true })
     }
 
     @Post('register')

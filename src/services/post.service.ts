@@ -76,8 +76,15 @@ export class PostService {
         return await new this.postModel(input).save()
     }
 
-    async update(search: SearchPostInput, input: UpdatePostInput): Promise<Post>{
-        return await this.postModel.findOneAndUpdate(search, input, { new: true, useFindAndModify: false })
+    async update({ _id }: SearchPostInput, input: UpdatePostInput): Promise<Post>{
+        let posts = await this.postModel.findByIdAndUpdate(_id, {
+            description: input.description,
+            categories: input.categories,
+            $pull: { metadata: { public_id: { $in: input.deleteFiles }}}
+        })
+        return await this.postModel.findByIdAndUpdate(_id, 
+            { $push: { metadata: input.metadata }},
+            { new: true, useFindAndModify: false })
     }
 
     async delete(search: SearchPostInput): Promise<Post>{

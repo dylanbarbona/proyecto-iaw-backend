@@ -10,6 +10,7 @@ export interface SearchCategoryInput {
     readonly skip?: number
 }
 
-export interface UpdateCategoryInput extends CreateCategoryInput {
-    readonly _id?: string
+export interface UpdateCategoryInput {
+    readonly name?: string
+    readonly description?: string
 }

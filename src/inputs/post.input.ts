@@ -1,9 +1,9 @@
-import { CreateCommentInput, UpdateCommentInput } from "./comment.input";
 import { Metadata } from "../models/metadata.model";
 
 export interface CreatePostInput {
     _id?: string
     user: string
+    files?: string[]
     categories: string[]
     description: string
     urls: string[]
@@ -24,10 +24,9 @@ export interface SearchPostInput {
 }
 
 export interface UpdatePostInput {
-    metadata: Metadata[];
-    _id?: string
-    user?: string
+    metadata?: any
+    files?: string[]
+    deleteFiles?: string[]
     categories?: string[]
     description?: string
-    urls?: string[]
 }

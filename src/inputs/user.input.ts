@@ -19,6 +19,7 @@ export interface CreateUserInput {
     readonly google_login: boolean
     readonly facebook_login: boolean
     readonly roles: Role[]
+    readonly file?: string
 }
 
 export interface SearchUserInput {
@@ -48,4 +49,5 @@ export interface UpdateUserInput {
       linkedin?: string
     }
     readonly roles?: Role[]
+    readonly file?: string
 }

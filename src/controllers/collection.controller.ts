@@ -1,11 +1,11 @@
-import { Controller, Get, UseGuards, Query, Param, Req, Body, Post, Put } from '@nestjs/common';
+import { Controller, Get, UseGuards, Query, Param, Req, Body, Post, Put, Delete } from '@nestjs/common';
 import { CollectionService } from '../services/collection.service';
 import { JwtAuthGuard, Roles } from '../auth/jwt.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Role } from '../models/user.model';
-import { SearchCollectionInput, CreateCollectionInput } from '../inputs/collection.input';
+import { SearchCollectionInput, CreateCollectionInput, UpdateCollectionInput } from '../inputs/collection.input';
 
-@Controller('collections')
+@Controller('collection')
 export class CollectionController {
     constructor(private readonly collectionService: CollectionService){}
 
@@ -31,17 +31,24 @@ export class CollectionController {
         return await this.collectionService.create(input)
     }
 
-    @Put(':id/add/:post')
+    @Put(':id/add')
     @Roles(Role.USER_ROLE)
     @UseGuards(JwtAuthGuard, RolesGuard)
-    async addPost(@Param('id') _id, @Param('post') post, @Body() input: CreateCollectionInput, @Req() req){
-        return await this.collectionService.addPost({ _id, user: req.user['_id'] }, { post })
+    async addPost(@Param('id') _id, @Body() input: UpdateCollectionInput, @Req() req){
+        return await this.collectionService.addPost({ _id, user: req.user['_id'] }, { post: input.post })
     }
 
-    @Put(':id/remove/:post')
+    @Put(':id/remove')
     @Roles(Role.USER_ROLE)
     @UseGuards(JwtAuthGuard, RolesGuard)
-    async removePost(@Param('id') _id, @Param('post') post, @Body() input: CreateCollectionInput, @Req() req){
-        return await this.collectionService.removePost({ _id, user: req.user['_id'] }, { post })
+    async removePost(@Param('id') _id, @Body() input: UpdateCollectionInput, @Req() req){
+        return await this.collectionService.removePost({ _id, user: req.user['_id'] }, { post: input.post })
+    }
+
+    @Delete(':id')
+    @Roles(Role.USER_ROLE)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    async delete(@Param('id') _id, @Req() req){
+        return await this.collectionService.delete({ _id, user: req.user['_id'] })
     }
 }

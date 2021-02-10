@@ -30,17 +30,13 @@ export class CloudinaryService {
         })
     }
 
-    async delete(public_id: string): Promise<CloudinaryFile> {
+    async delete(public_id: string): Promise<any> {
         return await this.cloudinary.uploader.destroy(public_id)
     }
 
-    async submitFile(file: any): Promise<CloudinaryFile>{
-        let cloudinary_file = await this.cloudinary.uploader.upload(file.path, { resource_type: this.getFileFormat(file.mimetype) }) as CloudinaryFile
-        fs.unlinkSync(file.path)
+    async submitFile(path: string, resource_type: string): Promise<CloudinaryFile>{
+        let cloudinary_file = await this.cloudinary.uploader.upload(path, { resource_type: resource_type }) as CloudinaryFile
+        fs.unlinkSync(path)
         return cloudinary_file
-    }
-
-    private getFileFormat(mimetype: string): string{
-        return mimetype.split('/')[0]
     }
 }
