@@ -7,7 +7,7 @@ export interface CreatePostInput {
     categories: string[]
     description: string
     urls: string[]
-    metadata: Metadata[]
+    metadata?: Metadata[]
 }
 
 export interface SearchPostInput {
@@ -23,10 +23,11 @@ export interface SearchPostInput {
     skip?: number
 }
 
-export interface UpdatePostInput {
-    metadata?: any
-    files?: string[]
+export interface UpdatePostInput extends Document{
+    metadata?: Metadata[]
+    addFiles?: string[]
     deleteFiles?: string[]
-    categories?: string[]
+    deleteCategories?: string[]
+    addCategories?: string[]
     description?: string
 }

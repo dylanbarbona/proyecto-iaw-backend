@@ -37,7 +37,7 @@ export class PostService {
     async getPostByDescription(search: SearchPostInput): Promise<Post[]>{
         return await this.postModel.find(
             { 
-                //$text: { $search: search.description },
+                $text: { $search: search.description },
                 createdAt: { 
                     $gte: search.createdAt_min || MIN_DATE, 
                     $lt: search.createdAt_max || MAX_DATE 
@@ -77,14 +77,22 @@ export class PostService {
     }
 
     async update({ _id }: SearchPostInput, input: UpdatePostInput): Promise<Post>{
-        let posts = await this.postModel.findByIdAndUpdate(_id, {
-            description: input.description,
-            categories: input.categories,
-            $pull: { metadata: { public_id: { $in: input.deleteFiles }}}
-        })
+        let posts = await this.postModel.findByIdAndUpdate(_id, 
+            {
+                description: input.description,
+                $pull: { 
+                    metadata: { public_id: { $in: input.deleteFiles || [] }},
+                    categories: { $in: input.deleteCategories || [] }
+                }
+            }, { new: true, useFindAndModify: false, multi: true })
         return await this.postModel.findByIdAndUpdate(_id, 
-            { $push: { metadata: input.metadata }},
-            { new: true, useFindAndModify: false })
+            { 
+                $push: {
+                    metadata: { $each: input.metadata || [] },
+                    categories: { $each: input.addCategories || [] }
+                }
+            },
+            { new: true, useFindAndModify: false, multi: true })
     }
 
     async delete(search: SearchPostInput): Promise<Post>{

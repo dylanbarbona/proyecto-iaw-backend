@@ -11,6 +11,7 @@ import { PostService } from '../services/post.service';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { DeletePhotosInterceptor } from '../interceptors/delete-photo.interceptor';
 import { CloudinaryFile } from 'src/cloudinary/cloudinary.interface';
+import { Metadata } from 'src/models/metadata.model';
 
 let fs = require('fs')
 
@@ -60,8 +61,8 @@ export class PostController {
     @Put(':id')
     @Roles(Role.USER_ROLE)
     @UseGuards(JwtAuthGuard, RolesGuard)
-    async update(@Param('id') _id: string, @Body() { files, ...input }: UpdatePostInput, @Req() req){
-        const metadata = await this.saveFiles(files)
+    async update(@Param('id') _id: string, @Body() { addFiles, ...input }: UpdatePostInput, @Req() req){
+        const metadata = await this.saveFiles(addFiles)
         input.deleteFiles.forEach(async public_id => await this.cloudinaryService.delete(public_id))
         input.metadata = metadata
         return await this.postService.update({ _id, user: req.user['_id'] }, input)
@@ -75,7 +76,7 @@ export class PostController {
         return await this.postService.delete({ _id, user: req.user['_id'] })
     }
 
-    private async saveFiles(photos: string[]): Promise<CloudinaryFile[]>{
+    private async saveFiles(photos: string[]): Promise<Metadata[]>{
         const path = 'uploads/'
         const filesDecoded = photos.map(photo => this.decodeBase64Image(photo))
         const metadataFiles = filesDecoded.map(({ format, resource_type, data }) => {
@@ -84,7 +85,7 @@ export class PostController {
             return { path: path+filename, resource_type }
         })
 
-        let cloudinaryFiles: CloudinaryFile[] = []
+        let cloudinaryFiles: Metadata[] = []
         for(const { path, resource_type } of metadataFiles)
             cloudinaryFiles.push(await this.cloudinaryService.submitFile(path, resource_type))
         return cloudinaryFiles

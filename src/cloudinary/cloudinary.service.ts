@@ -5,6 +5,8 @@ import { Provider } from '@nestjs/common';
 import * as CloudinaryLib from 'cloudinary';
 import { Config } from '../config/config.keys';
 import { CloudinaryFile } from './cloudinary.interface';
+import { Metadata } from '../models/metadata.model';
+
 const fs = require('fs')
 
 export const Cloudinary = 'lib:cloudinary';
@@ -34,8 +36,8 @@ export class CloudinaryService {
         return await this.cloudinary.uploader.destroy(public_id)
     }
 
-    async submitFile(path: string, resource_type: string): Promise<CloudinaryFile>{
-        let cloudinary_file = await this.cloudinary.uploader.upload(path, { resource_type: resource_type }) as CloudinaryFile
+    async submitFile(path: string, resource_type: string): Promise<Metadata>{
+        let cloudinary_file = await this.cloudinary.uploader.upload(path, { resource_type: resource_type }) as Metadata
         fs.unlinkSync(path)
         return cloudinary_file
     }

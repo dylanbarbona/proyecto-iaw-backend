@@ -1,8 +1,7 @@
 import { Prop, Schema, SchemaFactory,  } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema, Model } from 'mongoose';
 
-export interface Metadata {
-    _id?: String,
+export interface Metadata extends Document{
     updatedAt?: Date,
     createdAt?: Date,
     asset_id: string,
