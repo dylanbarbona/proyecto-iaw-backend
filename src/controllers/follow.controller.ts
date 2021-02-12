@@ -25,9 +25,9 @@ export class FollowController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @UseInterceptors(FollowNotificationInterceptor)
     async follow(@Req() req, @Param('username') username: string){
-        const { loggedUser, user } = await this.followService.follow(req.user.username, username)
+        const { loggedUser, user } = await this.followService.follow(req.user._id, username)
         if(!user)
-            return await this.followService.unfollow(req.user.username, username)
+            return await this.followService.unfollow(req.user._id, username)
         return { loggedUser, user }
     }
 }

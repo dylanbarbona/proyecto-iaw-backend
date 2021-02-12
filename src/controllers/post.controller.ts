@@ -40,8 +40,8 @@ export class PostController {
     @Roles(Role.USER_ROLE)
     @UseGuards(JwtAuthGuard, RolesGuard)
     async getFollowingPosts(@Query() search: SearchPostInput, @Req() req){ 
-        const user = req.user
-        return await this.postService.getFollowingPosts(user, search)
+        let user_id = req.user['_id']
+        return await this.postService.getFollowingPosts(user_id, search)
     }
 
     @Get(':id')

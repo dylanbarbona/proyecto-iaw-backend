@@ -5,15 +5,18 @@ import { SearchPostInput, CreatePostInput, UpdatePostInput } from '../inputs/pos
 import { Post } from '../models/post.model';
 import { User } from '../models/user.model';
 import { EMPTY_STRING, MAX_DATE, MIN_DATE, LIMIT, SKIP } from '../utils/utils'
+import { UserService } from './user.service';
 
 @Injectable()
 export class PostService {
-    constructor(@InjectModel('Post') readonly postModel: Model<Post>){ }
+    constructor(
+        @InjectModel('Post') readonly postModel: Model<Post>,
+        private readonly userService: UserService){ }
 
-    async getFollowingPosts(user: User, search: SearchPostInput): Promise<Post[]>{
-        return await this.postModel.find(
-            { 
-                user: { $in: user.followings.map(following => following.user) }, 
+    async getFollowingPosts(user_id: string, search: SearchPostInput): Promise<Post[]>{
+        const user = await this.userService.get({ _id: user_id })
+        return await this.postModel.find({
+                user: { $in: user.followings.map(following => following.user) },
                 createdAt: { 
                     $gte: search.createdAt_min || MIN_DATE, 
                     $lt: search.createdAt_max || MAX_DATE 
@@ -35,8 +38,7 @@ export class PostService {
     }
 
     async getPostByDescription(search: SearchPostInput): Promise<Post[]>{
-        return await this.postModel.find(
-            { 
+        return await this.postModel.find({ 
                 $text: { $search: search.description },
                 createdAt: { 
                     $gte: search.createdAt_min || MIN_DATE, 
@@ -52,9 +54,8 @@ export class PostService {
     }
 
     async getPostByUser(search: SearchPostInput): Promise<Post[]>{
-        return await this.postModel.find(
-            { 
-                user: search.user, 
+        return await this.postModel.find({
+                user: search.user,
                 createdAt: { 
                     $gte: search.createdAt_min || MIN_DATE, 
                     $lt: search.createdAt_max || MAX_DATE 
@@ -97,5 +98,9 @@ export class PostService {
 
     async delete(search: SearchPostInput): Promise<Post>{
         return await this.postModel.findOneAndDelete(search)
+    }
+
+    private getDate(date: Date, otherDate: Date){
+        return date ? date.getTime() : otherDate.getTime()
     }
 }

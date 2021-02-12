@@ -23,11 +23,9 @@ export class FollowService {
         return user.followings
     }
 
-    async follow(loggedUsername: string, username: string){
-        if(loggedUsername == username)
-            throw new BadRequestException()
+    async follow(loggedUserId: string, username: string){
         const session = await this.userModel.startSession()
-        let loggedUser = await this.userModel.findOne({ username: loggedUsername })
+        let loggedUser = await this.userModel.findOne({ _id: loggedUserId })
         try {
             session.startTransaction()
             let user = await this.userModel.findOneAndUpdate(
@@ -37,10 +35,13 @@ export class FollowService {
             ).populate({ path: this.FOLLOWERS, select: this.SELECTED_FIELDS })
 
             loggedUser = await this.userModel.findOneAndUpdate(
-                { username: loggedUsername, 'followings.user': { $nin: [user._id]}},
+                { _id: loggedUserId, 'followings.user': { $nin: [user._id]}},
                 { $push: { followings: { user: user._id }}},
                 { useFindAndModify: false, new: true }
             ).populate({ path: this.FOLLOWINGS, select: this.SELECTED_FIELDS })
+
+            if(user._id == loggedUser._id)
+                throw new BadRequestException()
             session.commitTransaction()
             return { loggedUser, user }
         } catch(exception){
@@ -50,11 +51,9 @@ export class FollowService {
         return { loggedUser }
     }
 
-    async unfollow(loggedUsername: string, username: string){
-        if(loggedUsername == username)
-            throw new BadRequestException()
+    async unfollow(loggedUserId: string, username: string){
         const session = await this.userModel.startSession()
-        let loggedUser = await this.userModel.findOne({ username: loggedUsername })
+        let loggedUser = await this.userModel.findOne({ _id: loggedUserId })
         let user = await this.userModel.findOne({ username })
         try {
             session.startTransaction()
@@ -65,10 +64,13 @@ export class FollowService {
             ).populate({ path: this.FOLLOWERS, select: this.SELECTED_FIELDS })
 
             loggedUser = await this.userModel.findOneAndUpdate(
-                { username: loggedUsername, 'followings.user': { $in: [user._id] } },
+                { _id: loggedUserId, 'followings.user': { $in: [user._id] } },
                 { $pull: { followings: { user: user._id }}},
                 { useFindAndModify: false, new: true }
             ).populate({ path: this.FOLLOWINGS, select: this.SELECTED_FIELDS })
+
+            if(user._id == loggedUser._id)
+                throw new BadRequestException()
 
             session.commitTransaction()
             return { loggedUser, user }
