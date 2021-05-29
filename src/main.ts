@@ -24,12 +24,15 @@ async function bootstrap() {
         }),
     );
     //Para limitar el tamaño de las imágenes
-    app.use(bodyParser.json({ limit: '10mb' }))
-    app.use(bodyParser.urlencoded({limit: '10mb', extended: true}))
+    app.use(bodyParser.json({ limit: '50mb' }))
+    app.use(bodyParser.urlencoded({limit: '50mb', extended: true}))
 
     //CORS
-    app.enableCors();
+    app.enableCors({
+        origin: process.env.HOST,
+        credentials: true,
+    });
     
-    await app.listen(process.env.PORT || 3000);
+    await app.listen(process.env.PORT);
 }
 bootstrap();
