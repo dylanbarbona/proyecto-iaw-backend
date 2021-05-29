@@ -12,11 +12,10 @@ export class CsrfMiddleware implements NestMiddleware {
             cookie: {
                 key: '_csrf',
                 path: '/',
-                httpOnly: false,
+                httpOnly: true,
                 secure: false,
-                signed: false,
                 maxAge: 24 * 60 * 60 * 1000 // 24 hours
-            }
+            },
         });
     }
     

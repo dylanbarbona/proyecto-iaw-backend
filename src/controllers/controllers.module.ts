@@ -45,5 +45,5 @@ export class ControllersModule {
     consumer
       .apply(CsrfMiddleware)
       .forRoutes(AuthController);
-  }
+    }
 }
