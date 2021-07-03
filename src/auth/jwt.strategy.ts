@@ -10,14 +10,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             jwtFromRequest: (req) => {
                 let token = null;
                 if (req && req.cookies)
-                    token = req.cookies['access_token'];
+                    token = req.cookies['Authorization'];
                 else if(req.handshake)
-                    token = cookie.parse(req.handshake.headers.cookie).access_token
+                    token = cookie.parse(req.handshake.headers.cookie).Authorization
                 return token
             },
             signOptions: { expiresIn: '3600s' },
             secretOrKey: process.env.SECRET_JWT
-        });
+          });
     }
 
     async validate(payload: any) {

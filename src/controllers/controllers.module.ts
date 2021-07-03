@@ -2,7 +2,6 @@ import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 
 import { ServicesModule } from '../services/services.module';
 import { ModelsModule } from '../models/models.module';
-import { UserService } from '../services/user.service';
 import { AuthModule } from '../auth/auth.module';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 
@@ -17,7 +16,6 @@ import { FollowController } from './follow.controller';
 import { CommentController } from './comment.controller';
 import { InterceptorsModule } from '../interceptors/interceptors.module';
 import { GatewaysModule } from '../gateways/gateways.module';
-import { CsrfMiddleware } from 'src/middlewares/csrf.middleware';
 
 @Module({
     imports: [ 
@@ -40,10 +38,4 @@ import { CsrfMiddleware } from 'src/middlewares/csrf.middleware';
         CommentController
     ]
 })
-export class ControllersModule {
-    configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(CsrfMiddleware)
-      .forRoutes(AuthController);
-    }
-}
+export class ControllersModule { }
