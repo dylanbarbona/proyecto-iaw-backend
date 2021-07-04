@@ -39,9 +39,14 @@ export class UserController {
 
     @Put()
     @UseGuards(JwtAuthGuard)
+    @UseInterceptors(FileInterceptor)
     async update(@Body(EncryptPasswordPipe) { file, ...input }: UpdateUserInput, @Req() req: Request){
-        const cloudinaryFile = await this.saveFiles(file) || { secure_url: 'NO_PHOTO' }
-        return await this.userService.update({ _id: req.user['_id'] }, { ...input, profile_photo: cloudinaryFile.secure_url })
+        let cloudinaryFile = null
+        if(file){
+            cloudinaryFile = await this.saveFiles(file) || { secure_url: 'NO_PHOTO' }
+            return await this.userService.update({ _id: req.user['_id'] }, { ...input, profile_photo: cloudinaryFile.secure_url })
+        } else
+            return await this.userService.update({ _id: req.user['_id'] }, input)
     }
 
     @Delete()

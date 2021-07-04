@@ -15,7 +15,6 @@ export class LikeService {
 
     async get(_id: String): Promise<Like[]>{
         const post = await this.postModel.findById(_id)
-            .populate({ path: this.LIKES, select: this.SELECTED_FIELDS})
         return post.likes
     }
 
@@ -24,7 +23,7 @@ export class LikeService {
             { _id, likes: { $not: { $elemMatch: input }}},
             { $push: { likes: input }},
             { useFindAndModify: false, new: true }
-        ).populate({ path: this.LIKES, select: this.SELECTED_FIELDS })
+        )
     }
 
     async unlike(_id: String, input: UpdateLikeInput): Promise<Post>{

@@ -21,6 +21,11 @@ export class PostController {
         private readonly postService: PostService,
         private readonly cloudinaryService: CloudinaryService){}
 
+    @Get('search/random')
+    async findRandom(@Query() search: SearchPostInput){
+        return await this.postService.getRandomPosts(search)
+    }
+
     @Get('search/categories')
     async findByCategory(@Query() search: SearchPostInput){ 
         return await this.postService.getPostByCategory(search)

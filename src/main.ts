@@ -24,8 +24,8 @@ async function bootstrap() {
 
     app.enableCors({ origin: JSON.parse(process.env.HOST), credentials: true });
     app.use(cookieParser(process.env.SECRET_COOKIE));
-    app.use(csrf({  cookie: { key: '_csrf', sameSite: true, httpOnly: true }}))
+    //app.use(csrf({  cookie: { key: '_csrf', sameSite: true, httpOnly: true }}))
 
-    await app.listen(process.env.PORT, '0.0.0.0');
+    await app.listen(process.env.PORT);
 }
 bootstrap();

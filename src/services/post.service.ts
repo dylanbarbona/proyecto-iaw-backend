@@ -13,6 +13,12 @@ export class PostService {
         @InjectModel('Post') readonly postModel: Model<Post>,
         private readonly userService: UserService){ }
 
+    async getRandomPosts(search: SearchPostInput){
+        return await this.postModel.aggregate([{
+            $sample: { size: ((search.skip-search.limit) > 0) ? search.skip-search.limit : 10 }
+        }])
+    }
+
     async getFollowingPosts(user_id: string, search: SearchPostInput): Promise<Post[]>{
         const user = await this.userService.get({ _id: user_id })
         return await this.postModel.find({

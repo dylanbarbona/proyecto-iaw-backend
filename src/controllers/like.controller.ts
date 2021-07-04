@@ -14,7 +14,7 @@ export class LikeController {
 
     @Get(':id/likes')
     async get(@Param('id') _id: string){
-        return { likes: await this.likeService.get(_id) }
+        return await this.likeService.get(_id)
     }
 
     @Post(':id/like')
