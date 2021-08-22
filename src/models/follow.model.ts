@@ -6,7 +6,7 @@ export interface Follower {
 }
 
 export const Followers = new MongooseSchema({
-    user: { type: MongooseSchema.Types.ObjectId, ref: 'User', unique: true },
+    user: { type: MongooseSchema.Types.ObjectId, ref: 'User' },
 }, { versionKey: false, _id: false });
 
 export interface Following {
@@ -14,5 +14,5 @@ export interface Following {
 }
 
 export const Followings = new MongooseSchema({
-    user: { type: MongooseSchema.Types.ObjectId, ref: 'User', unique: true },
+    user: { type: MongooseSchema.Types.ObjectId, ref: 'User' },
 }, { versionKey: false, _id: false });

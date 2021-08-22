@@ -28,7 +28,7 @@ export class UserService {
     }
 
     async login({ username, email }: SearchUserInput, pass: string): Promise<User> {
-        const user = await this.userModel.findOne({ username }).select('+password')
+        const user = await this.userModel.findOne({ email }).select('+password')
         if(!user)
             throw new UnauthorizedException()
         const isPasswordMatching = await bcrypt.compare(pass, user.password);

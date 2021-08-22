@@ -39,10 +39,10 @@ export class User extends Document {
         linkedin?: string
     }
 
-    @Prop({ type: [Followers], autopopulate: true })
+    @Prop({ type: [Followers], autopopulate: true, nullable: true, default: [] })
     followers: Follower[]
 
-    @Prop({ type: [Followings], autopopulate: true })
+    @Prop({ type: [Followings], autopopulate: true, nullable: true, default: [] })
     followings: Following[]
 
     @Prop({ nullable: true, default: false })

@@ -1,10 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as session from 'express-session';
 import * as cookieParser from 'cookie-parser';
 
 import * as express from 'express';
-var csrf = require('csurf');
 
 var bodyParser = require('body-parser')
 const path = require('path');
@@ -24,7 +22,6 @@ async function bootstrap() {
 
     app.enableCors({ origin: JSON.parse(process.env.HOST), credentials: true });
     app.use(cookieParser(process.env.SECRET_COOKIE));
-    //app.use(csrf({  cookie: { key: '_csrf', sameSite: true, httpOnly: true }}))
 
     await app.listen(process.env.PORT);
 }

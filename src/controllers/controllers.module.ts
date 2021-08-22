@@ -17,6 +17,8 @@ import { CommentController } from './comment.controller';
 import { InterceptorsModule } from '../interceptors/interceptors.module';
 import { GatewaysModule } from '../gateways/gateways.module';
 
+var csrf = require('csurf');
+
 @Module({
     imports: [ 
         ModelsModule,
@@ -38,4 +40,12 @@ import { GatewaysModule } from '../gateways/gateways.module';
         CommentController
     ]
 })
-export class ControllersModule { }
+export class ControllersModule { 
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+          .apply(csrf({ cookie: { key: '_csrf', httpOnly: true } }))
+          .forRoutes({ path: '/auth', method: RequestMethod.GET })
+          //.forRoutes(AuthController, UserController, CategoryController, CollectionController, PostController, NotificationController, LikeController, FollowController, CommentController)
+      }
+}
+

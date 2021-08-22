@@ -22,7 +22,7 @@ export class AuthController {
             token = req.csrfToken()
             res.cookie(this.XSRF_TOKEN, token)
         }
-        res.json({ ok: true })
+        res.json({ ok: token })
     }
 
     @Post('login')
