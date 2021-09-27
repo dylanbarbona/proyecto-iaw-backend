@@ -69,6 +69,6 @@ export class AuthController {
     @Get('check')
     @UseGuards(JwtAuthGuard)
     async check(@Req() req: Request, @Res() res: Response){
-        { ok: req.user != null }
+        res.status(HttpStatus.OK).json({ ok: req.user != null, user: req.user || null })
     }
 }

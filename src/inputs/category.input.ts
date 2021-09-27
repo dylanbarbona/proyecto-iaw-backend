@@ -5,6 +5,7 @@ export interface CreateCategoryInput {
 
 export interface SearchCategoryInput {
     readonly _id?: string
+    readonly term?: string
     readonly name?: string
     readonly limit?: number
     readonly skip?: number

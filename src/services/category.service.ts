@@ -14,7 +14,7 @@ export class CategoryService {
 
     async getAll(search: SearchCategoryInput): Promise<Category[]> {
         return await this.categoryModel.find({
-            name: { $regex:  `${search.name || this.EMPTY_STRING}` }
+            name: { $regex:  `${search.name || search.term || this.EMPTY_STRING}` },
         }).limit(Number(search.limit) || this.LIMIT).skip(Number(search.skip) || this.SKIP)
     }
 
