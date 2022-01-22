@@ -6,5 +6,5 @@ export class Like extends Document{
 }
 
 export const Likes = new MongooseSchema({
-    user: { type: MongooseSchema.Types.ObjectId, ref: 'User' },
+    user: { type: MongooseSchema.Types.ObjectId, ref: 'User', autopopulate: true },
 }, { timestamps: true, versionKey: false });
